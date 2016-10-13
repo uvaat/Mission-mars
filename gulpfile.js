@@ -3,7 +3,8 @@ var gulp = require("gulp"),
     babelify = require('babelify'),
     browserify = require("browserify"),
     connect = require("gulp-connect"),
-    source = require("vinyl-source-stream");
+    source = require("vinyl-source-stream"),
+    sass = require('gulp-sass');
 
 
 //Copy static files from html folder to build folder
@@ -15,8 +16,9 @@ gulp.task("copyStaticFiles", function(){
 //Convert ES6 ode in all js files in src/js folder and copy to 
 //build folder as bundle.js
 gulp.task("build", function(){
+
     return browserify({
-        entries: ["./app/index.js"]
+        entries: ["./app/main.js"]
     })
     .transform(babelify.configure({
         presets : ["es2015"]
@@ -25,10 +27,19 @@ gulp.task("build", function(){
     .pipe(source("bundle.js"))
     .pipe(gulp.dest("./build"))
     .pipe(connect.reload());
+
 });
 
-gulp.task('watch', ['build'], function () {
-    gulp.watch(['./app/*'], ['build']);
+gulp.task('sass', function(){
+    return gulp.src('scss/main.scss')
+        .pipe(sass()) // Converts Sass to CSS with gulp-sass
+        .pipe(gulp.dest('build/'))
+        .pipe(connect.reload());
+});
+
+gulp.task('watch', function () {
+    gulp.watch('./app/*', ['build']);
+    gulp.watch('./scss/*', ['sass']);
 });
 
 //Start a test server with doc root at build folder and 
