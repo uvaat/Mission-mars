@@ -50,7 +50,7 @@ var Area = function () {
 
 exports.default = Area;
 
-},{"jquery":8}],2:[function(require,module,exports){
+},{"jquery":10}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -69,6 +69,96 @@ var Element = function Element(name, color) {
 exports.default = Element;
 
 },{}],3:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Level = function Level(bord, elements, startPosition, level) {
+	_classCallCheck(this, Level);
+
+	this.level = level;
+	this.bord = bord;
+	this.elements = elements;
+	this.startPosition = startPosition;
+	this.stepSize = 150;
+};
+
+exports.default = Level;
+
+},{}],4:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _jquery = require('jquery');
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+var _Square = require('./Square');
+
+var _Square2 = _interopRequireDefault(_Square);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Map = function () {
+	function Map(level) {
+		var cssClass = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'map';
+
+		_classCallCheck(this, Map);
+
+		this.level = level;
+		this.cssClass = cssClass;
+		this.squares = [];
+
+		for (var i in this.level.bord) {
+			var element = this.level.elements[this.level.bord[i][1]];
+			var square = new _Square2.default(this.level.bord[i][0], element, this.level.stepSize);
+			this.squares.push(square);
+		}
+	}
+
+	_createClass(Map, [{
+		key: 'landingRobot',
+		value: function landingRobot(robot) {
+
+			robot.initDraw();
+
+			robot.setPosition(this.level.startPosition[0], this.level.startPosition[1]);
+
+			this.robot = robot;
+			this.$map.append(this.robot.$robot);
+		}
+	}, {
+		key: 'draw',
+		value: function draw($area) {
+
+			this.$map = (0, _jquery2.default)('<div></div>');
+			this.$map.addClass(this.cssClass);
+
+			for (var i in this.squares) {
+				this.squares[i].draw(this.$map);
+			}
+
+			$area.html(this.$map);
+		}
+	}]);
+
+	return Map;
+}();
+
+exports.default = Map;
+
+},{"./Square":7,"jquery":10}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -85,37 +175,63 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Map = function () {
-	function Map(squares) {
-		var cssClass = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'bord';
+var Robot = function () {
+	function Robot(step) {
+		var cssClass = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'robot';
 
-		_classCallCheck(this, Map);
+		_classCallCheck(this, Robot);
 
-		this.squares = squares;
 		this.cssClass = cssClass;
+		this.step = step;
+		this.style = {
+			background: '#34495e',
+			position: 'absolute',
+			width: step,
+			height: step
+		};
 	}
 
-	_createClass(Map, [{
-		key: 'draw',
-		value: function draw($area) {
+	_createClass(Robot, [{
+		key: 'setAction',
+		value: function setAction(actions) {
 
-			var $container = (0, _jquery2.default)('<div></div>');
-			$container.addClass(this.cssClass);
-
-			for (var i in this.squares) {
-				this.squares[i].draw($container);
-			}
-
-			$area.html($container);
+			this.actions = actions;
 		}
+	}, {
+		key: 'go',
+		value: function go() {
+
+			for (var i in this.actions) {}
+		}
+	}, {
+		key: 'initDraw',
+		value: function initDraw() {
+
+			this.$robot = (0, _jquery2.default)('<div></div>');
+			this.$robot.addClass(this.cssClass);
+			this.$robot.css(this.style);
+		}
+	}, {
+		key: 'setPosition',
+		value: function setPosition(nbStepTop, nbStepLeft) {
+
+			if (!this.$robot) this.initDraw();
+			this.$robot.css({
+				top: this.step * nbStepTop,
+				left: this.step * nbStepLeft
+			});
+		}
+	}, {
+		key: 'move',
+		value: function move(nbStepTop, nbStepLeft) {}
 	}]);
 
-	return Map;
+	return Robot;
 }();
 
-exports.default = Map;
+exports.default = Robot;
 
-},{"jquery":8}],4:[function(require,module,exports){
+},{"jquery":10}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -148,7 +264,7 @@ var Rock = function (_Element) {
 
 exports.default = Rock;
 
-},{"./Element":2}],5:[function(require,module,exports){
+},{"./Element":2}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -166,8 +282,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Square = function () {
-	function Square(height, element) {
-		var cssClass = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'square';
+	function Square(height, element, step) {
+		var cssClass = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'square';
 
 		_classCallCheck(this, Square);
 
@@ -176,8 +292,8 @@ var Square = function () {
 		this.cssClass = cssClass;
 
 		this.style = {
-			width: 150,
-			height: 150,
+			width: step,
+			height: step,
 			background: this.element.color,
 			float: 'left'
 		};
@@ -199,7 +315,7 @@ var Square = function () {
 
 exports.default = Square;
 
-},{"jquery":8}],6:[function(require,module,exports){
+},{"jquery":10}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -232,7 +348,7 @@ var Water = function (_Element) {
 
 exports.default = Water;
 
-},{"./Element":2}],7:[function(require,module,exports){
+},{"./Element":2}],9:[function(require,module,exports){
 'use strict';
 
 var _jquery = require('jquery');
@@ -259,29 +375,31 @@ var _Rock = require('./Rock');
 
 var _Rock2 = _interopRequireDefault(_Rock);
 
+var _Level = require('./Level');
+
+var _Level2 = _interopRequireDefault(_Level);
+
+var _Robot = require('./Robot');
+
+var _Robot2 = _interopRequireDefault(_Robot);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /** Création des éléments */
-var Elements = [new _Rock2.default(), new _Water2.default()];
+var elements = [new _Rock2.default(), new _Water2.default()];
 
 /** Création du niveau */
-var level_1 = [[1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 1], [1, 0], [1, 0], [1, 1], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0]];
+var bord_1 = [[1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 1], [1, 0], [1, 0], [1, 1], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0]];
 
-/** Définition des squares à importer dans la map */
-var squares = [];
-
-/** Création de la map */
-for (var i in level_1) {
-	var element = Elements[level_1[i][1]];
-	var square = new _Square2.default(level_1[i][0], element);
-	squares.push(square);
-}
+var level1 = new _Level2.default(bord_1, elements, [3, 0], 1);
 
 /** Nouvelle map */
-var map = new _Map2.default(squares);
+var map = new _Map2.default(level1);
 
 /** Nouveau jeu */
 var area = new _Area2.default(600, 'auto');
+
+var robot = new _Robot2.default(level1.stepSize);
 
 (0, _jquery2.default)(document).ready(function () {
 
@@ -289,9 +407,11 @@ var area = new _Area2.default(600, 'auto');
 	area.init();
 	/** Dessin de la map */
 	area.drawMap(map);
+	/** lancer le robot */
+	map.landingRobot(robot);
 });
 
-},{"./Area":1,"./Map":3,"./Rock":4,"./Square":5,"./Water":6,"jquery":8}],8:[function(require,module,exports){
+},{"./Area":1,"./Level":3,"./Map":4,"./Robot":5,"./Rock":6,"./Square":7,"./Water":8,"jquery":10}],10:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.1.1
  * https://jquery.com/
@@ -10513,4 +10633,4 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{}]},{},[7]);
+},{}]},{},[9]);

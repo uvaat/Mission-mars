@@ -2,9 +2,16 @@ import $ from 'jquery';
 
 class Robot {
 
-	constructor(){
+	constructor(step, cssClass = 'robot'){
 
-		this.style = {}
+		this.cssClass = cssClass;
+		this.step = step;
+		this.style = {
+			background : '#34495e',
+			position : 'absolute',
+			width : step,
+			height : step,
+		}
 
 	}
 
@@ -22,7 +29,26 @@ class Robot {
 
 	}
 
-	draw(){
+	initDraw(){
+
+		this.$robot = $('<div></div>');
+		this.$robot.addClass(this.cssClass);
+		this.$robot.css(this.style);
+
+	}
+
+	setPosition(nbStepTop, nbStepLeft){
+
+		if(!this.$robot) this.initDraw();
+		this.$robot.css({
+			top : this.step * nbStepTop,
+			left : this.step * nbStepLeft
+		});
+
+	}
+
+	move(nbStepTop, nbStepLeft){
+
 
 
 	}

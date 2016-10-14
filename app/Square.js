@@ -2,15 +2,15 @@ import $ from 'jquery';
 
 class Square {
 
-	constructor(height, element, cssClass = 'square'){
+	constructor(height, element, step, cssClass = 'square'){
 
 		this.height = height;
 		this.element = element;
 		this.cssClass = cssClass;
 
 		this.style = {
-			width : 150,
-			height: 150,
+			width : step,
+			height: step,
 			background: this.element.color,
 			float: 'left',
 		}
