@@ -50,7 +50,7 @@ var Area = function () {
 
 exports.default = Area;
 
-},{"jquery":10}],2:[function(require,module,exports){
+},{"jquery":11}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -69,25 +69,77 @@ var Element = function Element(name, color) {
 exports.default = Element;
 
 },{}],3:[function(require,module,exports){
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-	value: true
+    value: true
 });
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Level = function Level(bord, elements, startPosition, level) {
-	_classCallCheck(this, Level);
-
-	this.level = level;
-	this.bord = bord;
-	this.elements = elements;
-	this.startPosition = startPosition;
-	this.stepSize = 150;
+var isFunction = function isFunction(obj) {
+    return typeof obj == 'function' || false;
 };
 
-exports.default = Level;
+var EventEmitter = function () {
+    function EventEmitter() {
+        _classCallCheck(this, EventEmitter);
+
+        this.listeners = new Map();
+    }
+
+    _createClass(EventEmitter, [{
+        key: 'on',
+        value: function on(label, callback) {
+            this.listeners.has(label) || this.listeners.set(label, []);
+            this.listeners.get(label)[0] = callback;
+        }
+    }, {
+        key: 'remove',
+        value: function remove(label, callback) {
+
+            var listeners = this.listeners.get(label),
+                index = void 0;
+
+            if (listeners && listeners.length) {
+                index = listeners.reduce(function (i, listener, index) {
+                    return isFunction(listener) && listener === callback ? i = index : i;
+                }, -1);
+
+                if (index > -1) {
+                    listeners.splice(index, 1);
+                    this.listeners.set(label, listeners);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }, {
+        key: 'emit',
+        value: function emit(label) {
+            for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+                args[_key - 1] = arguments[_key];
+            }
+
+            var listeners = this.listeners.get(label);
+
+            if (listeners && listeners.length) {
+                listeners.forEach(function (listener) {
+                    listener.apply(undefined, args);
+                });
+                return true;
+            }
+            return false;
+        }
+    }]);
+
+    return EventEmitter;
+}();
+
+exports.default = EventEmitter;
 
 },{}],4:[function(require,module,exports){
 'use strict';
@@ -110,55 +162,106 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Map = function () {
-	function Map(level) {
-		var cssClass = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'map';
+var Ground = function () {
+	function Ground(level) {
+		var cssClass = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'ground';
 
-		_classCallCheck(this, Map);
+		_classCallCheck(this, Ground);
 
 		this.level = level;
 		this.cssClass = cssClass;
-		this.squares = [];
+		this.squares = {};
+
+		var index_top = 0;
+		var index_left = -1;
 
 		for (var i in this.level.bord) {
+
 			var element = this.level.elements[this.level.bord[i][1]];
 			var square = new _Square2.default(this.level.bord[i][0], element, this.level.stepSize);
-			this.squares.push(square);
+
+			if (index_left < this.level.leftMax - 1) {
+				index_left++;
+			} else {
+				index_left = 0;
+				index_top++;
+			}
+
+			this.squares[index_top + '_' + index_left] = square;
 		}
 	}
 
-	_createClass(Map, [{
+	_createClass(Ground, [{
+		key: 'setEventEmitter',
+		value: function setEventEmitter(event) {
+			this.event = event;
+		}
+	}, {
 		key: 'landingRobot',
 		value: function landingRobot(robot) {
 
 			robot.initDraw();
 
-			robot.setPosition(this.level.startPosition[0], this.level.startPosition[1]);
+			this.event.on('robot:checkground', function (position) {
+
+				var positionToCkeck = position.top + '_' + position.left;
+
+				if (this.squares[positionToCkeck]) {
+					this.event.emit('ground:robotcanmove', { position: position });
+				} else {
+					this.event.emit('ground:robotcantmove', { response: 'KO' });
+				}
+			}.bind(this));
+
+			robot.setNewPosition(this.level.startPosition[0], this.level.startPosition[1]);
 
 			this.robot = robot;
-			this.$map.append(this.robot.$robot);
+			this.$ground.append(this.robot.$robot);
 		}
 	}, {
 		key: 'draw',
 		value: function draw($area) {
 
-			this.$map = (0, _jquery2.default)('<div></div>');
-			this.$map.addClass(this.cssClass);
+			this.$ground = (0, _jquery2.default)('<div></div>');
+			this.$ground.addClass(this.cssClass);
 
 			for (var i in this.squares) {
-				this.squares[i].draw(this.$map);
+				this.squares[i].draw(this.$ground);
 			}
 
-			$area.html(this.$map);
+			$area.html(this.$ground);
 		}
 	}]);
 
-	return Map;
+	return Ground;
 }();
 
-exports.default = Map;
+exports.default = Ground;
 
-},{"./Square":7,"jquery":10}],5:[function(require,module,exports){
+},{"./Square":8,"jquery":11}],5:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Level = function Level(bord, elements, startPosition, level) {
+	_classCallCheck(this, Level);
+
+	this.level = level;
+	this.bord = bord;
+	this.elements = elements;
+	this.startPosition = startPosition;
+	this.stepSize = 150;
+	this.leftMax = 4;
+	this.topMax = 4;
+};
+
+exports.default = Level;
+
+},{}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -192,16 +295,47 @@ var Robot = function () {
 	}
 
 	_createClass(Robot, [{
+		key: 'setEventEmitter',
+		value: function setEventEmitter(eventEmitter) {
+
+			this.eventEmitter = eventEmitter;
+
+			this.eventEmitter.on('ground:robotcanmove', function (response) {
+
+				this.currentPosition = response.position;
+
+				this.$robot.css({
+					top: this.currentPosition.top * this.step,
+					left: this.currentPosition.left * this.step
+				});
+			}.bind(this));
+		}
+	}, {
 		key: 'setAction',
 		value: function setAction(actions) {
-
 			this.actions = actions;
 		}
 	}, {
 		key: 'go',
 		value: function go() {
 
-			for (var i in this.actions) {}
+			var that = this;
+
+			setTimeout(function () {
+
+				for (var i in that.actions) {
+
+					var action = that.actions[i];
+
+					(function (that, action, i) {
+
+						setTimeout(function () {
+
+							that.doAction(action);
+						}, 1000 * i);
+					})(that, action, i);
+				}
+			}, 1000);
 		}
 	}, {
 		key: 'initDraw',
@@ -212,18 +346,58 @@ var Robot = function () {
 			this.$robot.css(this.style);
 		}
 	}, {
-		key: 'setPosition',
-		value: function setPosition(nbStepTop, nbStepLeft) {
+		key: 'checkNewPosition',
+		value: function checkNewPosition(nbStepTop, nbStepLeft) {
+
+			if (!this.currentPosition) this.currentPosition = { top: 0, left: 0 };
+
+			var newleft = 0;
+			var newtop = 0;
+
+			if (nbStepTop !== 0) newtop = nbStepTop + this.currentPosition.top;else newtop = this.currentPosition.top;
+
+			if (nbStepLeft !== 0) newleft = nbStepLeft + this.currentPosition.left;else newleft = this.currentPosition.left;
+
+			this.eventEmitter.emit('robot:checkground', { top: newtop, left: newleft });
+		}
+	}, {
+		key: 'setNewPosition',
+		value: function setNewPosition(nbStepTop, nbStepLeft) {
 
 			if (!this.$robot) this.initDraw();
-			this.$robot.css({
-				top: this.step * nbStepTop,
-				left: this.step * nbStepLeft
-			});
+			this.checkNewPosition(nbStepTop, nbStepLeft);
 		}
 	}, {
 		key: 'move',
-		value: function move(nbStepTop, nbStepLeft) {}
+		value: function move(direction) {
+
+			switch (direction) {
+
+				case "top":
+					this.setNewPosition(-1, 0);
+					break;
+				case "right":
+					this.setNewPosition(0, 1);
+					break;
+				case "bottom":
+					this.setNewPosition(1, 0);
+					break;
+				case "left":
+					this.setNewPosition(0, -1);
+					break;
+
+			}
+		}
+	}, {
+		key: 'doAction',
+		value: function doAction(action) {
+
+			switch (action.type) {
+				case "move":
+					return this.move(action.direction);
+					break;
+			}
+		}
 	}]);
 
 	return Robot;
@@ -231,7 +405,7 @@ var Robot = function () {
 
 exports.default = Robot;
 
-},{"jquery":10}],6:[function(require,module,exports){
+},{"jquery":11}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -264,7 +438,7 @@ var Rock = function (_Element) {
 
 exports.default = Rock;
 
-},{"./Element":2}],7:[function(require,module,exports){
+},{"./Element":2}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -315,7 +489,7 @@ var Square = function () {
 
 exports.default = Square;
 
-},{"jquery":10}],8:[function(require,module,exports){
+},{"jquery":11}],9:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -348,7 +522,7 @@ var Water = function (_Element) {
 
 exports.default = Water;
 
-},{"./Element":2}],9:[function(require,module,exports){
+},{"./Element":2}],10:[function(require,module,exports){
 'use strict';
 
 var _jquery = require('jquery');
@@ -359,9 +533,9 @@ var _Area = require('./Area');
 
 var _Area2 = _interopRequireDefault(_Area);
 
-var _Map = require('./Map');
+var _Ground = require('./Ground');
 
-var _Map2 = _interopRequireDefault(_Map);
+var _Ground2 = _interopRequireDefault(_Ground);
 
 var _Square = require('./Square');
 
@@ -383,7 +557,14 @@ var _Robot = require('./Robot');
 
 var _Robot2 = _interopRequireDefault(_Robot);
 
+var _EventEmitter = require('./EventEmitter');
+
+var _EventEmitter2 = _interopRequireDefault(_EventEmitter);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/** Event */
+var eventEmitter = new _EventEmitter2.default();
 
 /** Création des éléments */
 var elements = [new _Rock2.default(), new _Water2.default()];
@@ -391,27 +572,36 @@ var elements = [new _Rock2.default(), new _Water2.default()];
 /** Création du niveau */
 var bord_1 = [[1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 1], [1, 0], [1, 0], [1, 1], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0]];
 
+/** Création du level */
 var level1 = new _Level2.default(bord_1, elements, [3, 0], 1);
 
 /** Nouvelle map */
-var map = new _Map2.default(level1);
+var ground = new _Ground2.default(level1);
+ground.setEventEmitter(eventEmitter);
 
 /** Nouveau jeu */
 var area = new _Area2.default(600, 'auto');
 
+/** Nouveau Robot */
 var robot = new _Robot2.default(level1.stepSize);
+robot.setEventEmitter(eventEmitter);
+
+var actionsRobot = [{ type: 'move', direction: 'right' }, { type: 'move', direction: 'top' }, { type: 'move', direction: 'right' }];
 
 (0, _jquery2.default)(document).ready(function () {
 
 	/** Initialisation du jeu */
 	area.init();
 	/** Dessin de la map */
-	area.drawMap(map);
+	area.drawMap(ground);
 	/** lancer le robot */
-	map.landingRobot(robot);
+	ground.landingRobot(robot);
+
+	robot.setAction(actionsRobot);
+	robot.go();
 });
 
-},{"./Area":1,"./Level":3,"./Map":4,"./Robot":5,"./Rock":6,"./Square":7,"./Water":8,"jquery":10}],10:[function(require,module,exports){
+},{"./Area":1,"./EventEmitter":3,"./Ground":4,"./Level":5,"./Robot":6,"./Rock":7,"./Square":8,"./Water":9,"jquery":11}],11:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.1.1
  * https://jquery.com/
@@ -10633,4 +10823,4 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{}]},{},[9]);
+},{}]},{},[10]);
