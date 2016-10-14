@@ -10,7 +10,7 @@ class EventEmitter {
 
   on(label, callback) {
     this.listeners.has(label) || this.listeners.set(label, []);
-    this.listeners.get(label)[0] = callback;
+    this.listeners.get(label).push(callback);
   }
 
   remove(label, callback) {
@@ -31,12 +31,10 @@ class EventEmitter {
               return true;
           }
       }
-
       return false;
   }
 
   emit(label, ...args) {
-
       let listeners = this.listeners.get(label);
       
       if (listeners && listeners.length) {

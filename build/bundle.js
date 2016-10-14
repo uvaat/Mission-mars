@@ -94,7 +94,7 @@ var EventEmitter = function () {
         key: 'on',
         value: function on(label, callback) {
             this.listeners.has(label) || this.listeners.set(label, []);
-            this.listeners.get(label)[0] = callback;
+            this.listeners.get(label).push(callback);
         }
     }, {
         key: 'remove',
@@ -114,7 +114,6 @@ var EventEmitter = function () {
                     return true;
                 }
             }
-
             return false;
         }
     }, {
@@ -192,8 +191,8 @@ var Ground = function () {
 	}
 
 	_createClass(Ground, [{
-		key: 'setEventEmitter',
-		value: function setEventEmitter(event) {
+		key: 'setEvent',
+		value: function setEvent(event) {
 			this.event = event;
 		}
 	}, {
@@ -201,6 +200,7 @@ var Ground = function () {
 		value: function landingRobot(robot) {
 
 			robot.initDraw();
+			this.robot = robot;
 
 			this.event.on('robot:checkground', function (position) {
 
@@ -213,9 +213,8 @@ var Ground = function () {
 				}
 			}.bind(this));
 
-			robot.setNewPosition(this.level.startPosition[0], this.level.startPosition[1]);
+			robot.setNewPosition(this.level.startPosition[0], this.level.startPosition[1], true);
 
-			this.robot = robot;
 			this.$ground.append(this.robot.$robot);
 		}
 	}, {
@@ -295,20 +294,30 @@ var Robot = function () {
 	}
 
 	_createClass(Robot, [{
-		key: 'setEventEmitter',
-		value: function setEventEmitter(eventEmitter) {
+		key: 'setEvent',
+		value: function setEvent(event) {
 
-			this.eventEmitter = eventEmitter;
+			this.event = event;
+			this.event.on('ground:robotcanmove', this.waitEventCanMove.bind(this));
+			this.event.on('ground:robotcantmove', this.waitEventCantMove.bind(this));
+		}
+	}, {
+		key: 'waitEventCantMove',
+		value: function waitEventCantMove(response) {
 
-			this.eventEmitter.on('ground:robotcanmove', function (response) {
+			this.cantMove = true;
+			this.setNewPosition(this.startPosition.top, this.startPosition.left, true);
+		}
+	}, {
+		key: 'waitEventCanMove',
+		value: function waitEventCanMove(response) {
 
-				this.currentPosition = response.position;
+			this.currentPosition = response.position;
 
-				this.$robot.css({
-					top: this.currentPosition.top * this.step,
-					left: this.currentPosition.left * this.step
-				});
-			}.bind(this));
+			this.$robot.css({
+				top: this.currentPosition.top * this.step,
+				left: this.currentPosition.left * this.step
+			});
 		}
 	}, {
 		key: 'setAction',
@@ -349,8 +358,6 @@ var Robot = function () {
 		key: 'checkNewPosition',
 		value: function checkNewPosition(nbStepTop, nbStepLeft) {
 
-			if (!this.currentPosition) this.currentPosition = { top: 0, left: 0 };
-
 			var newleft = 0;
 			var newtop = 0;
 
@@ -358,13 +365,21 @@ var Robot = function () {
 
 			if (nbStepLeft !== 0) newleft = nbStepLeft + this.currentPosition.left;else newleft = this.currentPosition.left;
 
-			this.eventEmitter.emit('robot:checkground', { top: newtop, left: newleft });
+			this.event.emit('robot:checkground', { top: newtop, left: newleft });
 		}
 	}, {
 		key: 'setNewPosition',
 		value: function setNewPosition(nbStepTop, nbStepLeft) {
+			var init = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
 
 			if (!this.$robot) this.initDraw();
+
+			if (init) this.startPosition = { top: nbStepTop, left: nbStepLeft };
+			if (init) this.currentPosition = { top: 0, left: 0 };
+
+			if (this.cantMove && !init) return;
+
 			this.checkNewPosition(nbStepTop, nbStepLeft);
 		}
 	}, {
@@ -391,6 +406,8 @@ var Robot = function () {
 	}, {
 		key: 'doAction',
 		value: function doAction(action) {
+
+			if (this.cantMove) return;
 
 			switch (action.type) {
 				case "move":
@@ -577,16 +594,16 @@ var level1 = new _Level2.default(bord_1, elements, [3, 0], 1);
 
 /** Nouvelle map */
 var ground = new _Ground2.default(level1);
-ground.setEventEmitter(eventEmitter);
+ground.setEvent(eventEmitter);
 
 /** Nouveau jeu */
 var area = new _Area2.default(600, 'auto');
 
 /** Nouveau Robot */
 var robot = new _Robot2.default(level1.stepSize);
-robot.setEventEmitter(eventEmitter);
+robot.setEvent(eventEmitter);
 
-var actionsRobot = [{ type: 'move', direction: 'right' }, { type: 'move', direction: 'top' }, { type: 'move', direction: 'right' }];
+var actionsRobot = [{ type: 'move', direction: 'right' }, { type: 'move', direction: 'right' }, { type: 'move', direction: 'right' }, { type: 'move', direction: 'top' }, { type: 'move', direction: 'top' }, { type: 'move', direction: 'top' }, { type: 'move', direction: 'left' }, { type: 'move', direction: 'left' }, { type: 'move', direction: 'left' }, { type: 'move', direction: 'bottom' }, { type: 'move', direction: 'right' }, { type: 'move', direction: 'right' }, { type: 'move', direction: 'bottom' }, { type: 'move', direction: 'left' }];
 
 (0, _jquery2.default)(document).ready(function () {
 

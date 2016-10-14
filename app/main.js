@@ -30,19 +30,30 @@ var level1 = new Level(bord_1, elements, [3, 0], 1);
 
 /** Nouvelle map */
 var ground = new Ground(level1);
-ground.setEventEmitter(eventEmitter);
+ground.setEvent(eventEmitter);
 
 /** Nouveau jeu */
 var area = new Area(600, 'auto');
 
 /** Nouveau Robot */
 var robot = new Robot(level1.stepSize);
-robot.setEventEmitter(eventEmitter);
+robot.setEvent(eventEmitter);
 
 var actionsRobot = [
 	{type : 'move', direction : 'right'},
+	{type : 'move', direction : 'right'},
+	{type : 'move', direction : 'right'},
 	{type : 'move', direction : 'top'},
-	{type : 'move', direction : 'right'}
+	{type : 'move', direction : 'top'},
+	{type : 'move', direction : 'top'},
+	{type : 'move', direction : 'left'},
+	{type : 'move', direction : 'left'},
+	{type : 'move', direction : 'left'},
+	{type : 'move', direction : 'bottom'},
+	{type : 'move', direction : 'right'},
+	{type : 'move', direction : 'right'},
+	{type : 'move', direction : 'bottom'},
+	{type : 'move', direction : 'left'}
 ]
 
 $(document).ready(function(){

@@ -15,20 +15,29 @@ class Robot{
 
 	}
 
-	setEventEmitter(eventEmitter){
+	setEvent(event){
 
-		this.eventEmitter = eventEmitter;
+		this.event = event;
+		this.event.on('ground:robotcanmove', this.waitEventCanMove.bind(this));
+		this.event.on('ground:robotcantmove', this.waitEventCantMove.bind(this));
 
-		this.eventEmitter.on('ground:robotcanmove', function(response){
+	}
 
-			this.currentPosition = response.position;
+	waitEventCantMove(response){
 
-			this.$robot.css({
-				top : this.currentPosition.top * this.step,
-				left : this.currentPosition.left * this.step,
-			});
+		this.cantMove = true;
+		this.setNewPosition(this.startPosition.top, this.startPosition.left, true);
 
-		}.bind(this));
+	}
+
+	waitEventCanMove(response){
+
+		this.currentPosition = response.position;
+
+		this.$robot.css({
+			top : this.currentPosition.top * this.step,
+			left : this.currentPosition.left * this.step,
+		});
 
 	}
 
@@ -49,7 +58,7 @@ class Robot{
 				(function(that, action, i){
 
 					setTimeout(function(){ 
-						
+										
 						that.doAction(action);
 
 					}, 1000 * i);
@@ -70,9 +79,8 @@ class Robot{
 
 	}
 
-	checkNewPosition(nbStepTop, nbStepLeft){
 
-		if(!this.currentPosition) this.currentPosition = {top: 0, left : 0};
+	checkNewPosition(nbStepTop, nbStepLeft){
 
 		let newleft = 0;
 		let newtop = 0;
@@ -87,14 +95,19 @@ class Robot{
 		else
 			newleft = this.currentPosition.left;
 
-		this.eventEmitter.emit('robot:checkground', {top : newtop, left : newleft});
-		
+		this.event.emit('robot:checkground', {top : newtop, left : newleft});		
 	
 	}
 
-	setNewPosition(nbStepTop, nbStepLeft){
-
+	setNewPosition(nbStepTop, nbStepLeft, init = false){
+		
 		if(!this.$robot) this.initDraw();
+
+		if(init) this.startPosition = {top : nbStepTop, left : nbStepLeft};
+		if(init) this.currentPosition = {top: 0, left : 0};
+
+		if(this.cantMove && !init) return;
+
 		this.checkNewPosition(nbStepTop, nbStepLeft);
 
 	}
@@ -121,6 +134,8 @@ class Robot{
 	}
 
 	doAction(action){
+
+		if(this.cantMove) return;		
 
 		switch (action.type) {
 			case "move": 

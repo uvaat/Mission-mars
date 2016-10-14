@@ -31,13 +31,14 @@ class Ground {
 
 	}
 
-	setEventEmitter(event){
+	setEvent(event){
 		this.event = event;
 	}
 
 	landingRobot(robot){
 
 		robot.initDraw();
+		this.robot = robot;
 		
 		this.event.on('robot:checkground', function(position){
 
@@ -51,9 +52,8 @@ class Ground {
 
 		}.bind(this));
 
-		robot.setNewPosition(this.level.startPosition[0], this.level.startPosition[1]);
+		robot.setNewPosition(this.level.startPosition[0], this.level.startPosition[1], true);
 
-		this.robot = robot;
 		this.$ground.append(this.robot.$robot);
 
 	}
