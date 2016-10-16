@@ -45,18 +45,7 @@ robot.setEvent(eventEmitter);
 var actionsRobot = [
 	{type : 'move', direction : 'right'},
 	{type : 'move', direction : 'right'},
-	{type : 'move', direction : 'right'},
-	{type : 'move', direction : 'top'},
-	{type : 'move', direction : 'top'},
-	{type : 'move', direction : 'top'},
-	{type : 'move', direction : 'left'},
-	{type : 'move', direction : 'left'},
-	{type : 'move', direction : 'left'},
-	{type : 'move', direction : 'bottom'},
-	{type : 'move', direction : 'right'},
-	{type : 'move', direction : 'right'},
-	{type : 'move', direction : 'bottom'},
-	{type : 'move', direction : 'left'}
+	{type : 'move', direction : 'bottom'}
 ];
 
 /** Nouveau jeu */
@@ -69,14 +58,16 @@ $(document).ready(function(){
 	/** Dessin de la map */
 	area.drawMap(ground, target);
 
+	/** Nouveau tour */
 	var turn = new Turn(ground, robot, target);
+
 	/** lancer le robot */
 	turn.landingRobot();
 
 	/** Ajouter les actions au robot */
 	robot.setAction(actionsRobot);
-	/** Lancer le robot */
 
+	/** Lancer le tour */
 	turn.go();
 
 })

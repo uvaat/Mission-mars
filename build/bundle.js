@@ -242,11 +242,12 @@ var Level = function () {
 	function Level(bord, elements, startPosition, targetPosition, level) {
 		_classCallCheck(this, Level);
 
-		this.level = level;
 		this.bord = bord;
 		this.elements = elements;
 		this.startPosition = startPosition;
 		this.targetPosition = targetPosition;
+		this.level = level;
+
 		this.step = 150;
 		this.leftMax = 4;
 		this.topMax = 4;
@@ -522,6 +523,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Turn = function () {
+
+	/**
+  * Tour de jeux
+  * @param  {Groud} ground (la map)
+  * @param  {Robot} robot  (le robot)
+  * @param  {Target} target (la cible du robot)
+  * @return {Void}
+  */
 	function Turn(ground, robot, target) {
 		_classCallCheck(this, Turn);
 
@@ -534,9 +543,15 @@ var Turn = function () {
 		this.ground.$ground.append(this.target.$target);
 	}
 
+	/**
+  * Déposer le robot du la map
+  * @return {Void}
+  */
+
+
 	_createClass(Turn, [{
 		key: 'landingRobot',
-		value: function landingRobot(robot) {
+		value: function landingRobot() {
 
 			this.robot.initDraw();
 
@@ -546,21 +561,40 @@ var Turn = function () {
 			this.robot.setNewPosition(position);
 			this.ground.$ground.append(this.robot.$robot);
 		}
+
+		/**
+   * Vérifier la case de la map
+   * @param  {Json} position
+   * @return {Bool}
+   */
+
 	}, {
 		key: 'checkGround',
 		value: function checkGround(position) {
 
-			return true;
 			return this.ground.getSquare(position.top, position.left);
 		}
+
+		/**
+   * Verifier si la position est la même que la cible à attendre
+   * @param  {Json} position
+   * @return {Bool}
+   */
+
 	}, {
 		key: 'checkTarget',
 		value: function checkTarget(position) {
 
 			var target = this.target.position;
-			if (target.top == position.top && target.left == position.left) return true;
-			return false;
+			return target.top == position.top && target.left == position.left;
 		}
+
+		/**
+   * Action bouger
+   * @param  {String} direction (la direction que doit prendre le robot)
+   * @return {Bool}
+   */
+
 	}, {
 		key: 'move',
 		value: function move(direction) {
@@ -570,6 +604,16 @@ var Turn = function () {
 				var position = this.robot.getNewPosition(top, left);
 
 				var canGo = this.checkGround(position);
+
+				if (!canGo) {
+
+					this.clearInterval();
+
+					console.log('you loose');
+
+					return false;
+				}
+
 				this.robot.setNewPosition(position);
 
 				if (this.checkTarget(position)) {
@@ -579,6 +623,8 @@ var Turn = function () {
 					setTimeout(function () {
 						console.log('you win');
 					}, this.speed);
+
+					return false;
 				}
 
 				return true;
@@ -603,6 +649,13 @@ var Turn = function () {
 
 			return false;
 		}
+
+		/**
+   * Actionner un action du robot
+   * @param  {Json} action
+   * @return {Bool}
+   */
+
 	}, {
 		key: 'doAction',
 		value: function doAction(action) {
@@ -613,6 +666,12 @@ var Turn = function () {
 					break;
 			}
 		}
+
+		/**
+   * Reset le tour
+   * @return {Interval}
+   */
+
 	}, {
 		key: 'clearInterval',
 		value: function (_clearInterval) {
@@ -628,6 +687,12 @@ var Turn = function () {
 		}(function () {
 			clearInterval(this.interval);
 		})
+
+		/**
+   * Lancer le tour
+   * @return {Void}
+   */
+
 	}, {
 		key: 'go',
 		value: function go() {
@@ -760,7 +825,7 @@ ground.setEvent(eventEmitter);
 var robot = new _Robot2.default(level1);
 robot.setEvent(eventEmitter);
 
-var actionsRobot = [{ type: 'move', direction: 'right' }, { type: 'move', direction: 'right' }, { type: 'move', direction: 'right' }, { type: 'move', direction: 'top' }, { type: 'move', direction: 'top' }, { type: 'move', direction: 'top' }, { type: 'move', direction: 'left' }, { type: 'move', direction: 'left' }, { type: 'move', direction: 'left' }, { type: 'move', direction: 'bottom' }, { type: 'move', direction: 'right' }, { type: 'move', direction: 'right' }, { type: 'move', direction: 'bottom' }, { type: 'move', direction: 'left' }];
+var actionsRobot = [{ type: 'move', direction: 'right' }, { type: 'move', direction: 'right' }, { type: 'move', direction: 'bottom' }];
 
 /** Nouveau jeu */
 var area = new _Area2.default(600, 'auto');
@@ -772,14 +837,16 @@ var area = new _Area2.default(600, 'auto');
 	/** Dessin de la map */
 	area.drawMap(ground, target);
 
+	/** Nouveau tour */
 	var turn = new _Turn2.default(ground, robot, target);
+
 	/** lancer le robot */
 	turn.landingRobot();
 
 	/** Ajouter les actions au robot */
 	robot.setAction(actionsRobot);
-	/** Lancer le robot */
 
+	/** Lancer le tour */
 	turn.go();
 });
 
