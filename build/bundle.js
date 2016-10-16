@@ -253,6 +253,11 @@ var Level = function () {
 	}
 
 	_createClass(Level, [{
+		key: "getStart",
+		value: function getStart() {
+			return { top: this.startPosition[0], left: this.startPosition[1] };
+		}
+	}, {
 		key: "getTarget",
 		value: function getTarget() {
 			return { top: this.targetPosition[0], left: this.targetPosition[1] };
@@ -500,7 +505,7 @@ var Target = function () {
 exports.default = Target;
 
 },{"jquery":13}],10:[function(require,module,exports){
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
 	value: true
@@ -508,7 +513,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _jquery = require("jquery");
+var _jquery = require('jquery');
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -530,25 +535,26 @@ var Turn = function () {
 	}
 
 	_createClass(Turn, [{
-		key: "landingRobot",
+		key: 'landingRobot',
 		value: function landingRobot(robot) {
 
 			this.robot.initDraw();
 
-			var position = this.robot.getNewPosition(this.ground.level.startPosition[0], this.ground.level.startPosition[1]);
+			var start = this.ground.level.getStart();
+			var position = this.robot.getNewPosition(start.top, start.left);
 
 			this.robot.setNewPosition(position);
 			this.ground.$ground.append(this.robot.$robot);
 		}
 	}, {
-		key: "checkGround",
+		key: 'checkGround',
 		value: function checkGround(position) {
 
 			return true;
 			return this.ground.getSquare(position.top, position.left);
 		}
 	}, {
-		key: "checkTarget",
+		key: 'checkTarget',
 		value: function checkTarget(position) {
 
 			var target = this.target.position;
@@ -556,10 +562,8 @@ var Turn = function () {
 			return false;
 		}
 	}, {
-		key: "move",
+		key: 'move',
 		value: function move(direction) {
-
-			var that = this;
 
 			var move = function (top, left) {
 
@@ -568,7 +572,14 @@ var Turn = function () {
 				var canGo = this.checkGround(position);
 				this.robot.setNewPosition(position);
 
-				//if(this.checkTarget(position)) alert('win !');
+				if (this.checkTarget(position)) {
+
+					this.clearInterval();
+
+					setTimeout(function () {
+						console.log('you win');
+					}, this.speed);
+				}
 
 				return true;
 			}.bind(this);
@@ -593,7 +604,7 @@ var Turn = function () {
 			return false;
 		}
 	}, {
-		key: "doAction",
+		key: 'doAction',
 		value: function doAction(action) {
 
 			switch (action.type) {
@@ -603,7 +614,7 @@ var Turn = function () {
 			}
 		}
 	}, {
-		key: "clearInterval",
+		key: 'clearInterval',
 		value: function (_clearInterval) {
 			function clearInterval() {
 				return _clearInterval.apply(this, arguments);
@@ -618,7 +629,7 @@ var Turn = function () {
 			clearInterval(this.interval);
 		})
 	}, {
-		key: "go",
+		key: 'go',
 		value: function go() {
 
 			var index = 0;

@@ -18,8 +18,8 @@ class Turn {
 
 		this.robot.initDraw();
 
-		let position = this.robot.getNewPosition(
-			this.ground.level.startPosition[0], this.ground.level.startPosition[1]);
+		let start = this.ground.level.getStart();
+		let position = this.robot.getNewPosition(start.top, start.left);
 
 		this.robot.setNewPosition(position);
 		this.ground.$ground.append(this.robot.$robot);
@@ -43,8 +43,6 @@ class Turn {
 
 	move(direction){
 
-		var that = this;
-
 		let move = function(top, left){
 
 			let position = this.robot.getNewPosition(top, left);
@@ -52,7 +50,15 @@ class Turn {
 			let canGo = this.checkGround(position);
 			this.robot.setNewPosition(position);
 			
-			//if(this.checkTarget(position)) alert('win !');
+			if(this.checkTarget(position)){
+				
+				this.clearInterval();
+
+				setTimeout(function(){
+					console.log('you win');
+				}, this.speed);
+
+			}
 			
 			return true;
 				
