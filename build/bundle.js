@@ -50,7 +50,7 @@ var Area = function () {
 
 exports.default = Area;
 
-},{"jquery":11}],2:[function(require,module,exports){
+},{"jquery":13}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -171,51 +171,41 @@ var Ground = function () {
 		this.cssClass = cssClass;
 		this.squares = {};
 
-		var index_top = 0;
-		var index_left = -1;
+		var indexTop = 0;
+		var indexLeft = -1;
 
 		for (var i in this.level.bord) {
 
 			var element = this.level.elements[this.level.bord[i][1]];
-			var square = new _Square2.default(this.level.bord[i][0], element, this.level.stepSize);
+			var square = new _Square2.default(this.level.bord[i][0], element, this.level.step);
 
-			if (index_left < this.level.leftMax - 1) {
-				index_left++;
+			if (indexLeft < this.level.leftMax - 1) {
+				indexLeft++;
 			} else {
-				index_left = 0;
-				index_top++;
+				indexLeft = 0;
+				indexTop++;
 			}
 
-			this.squares[index_top + '_' + index_left] = square;
+			var key = this.getSquareKey(indexLeft, indexTop);
+			this.squares[key] = square;
 		}
 	}
 
 	_createClass(Ground, [{
+		key: 'getSquare',
+		value: function getSquare(indexTop, indexLeft) {
+			var key = this.getSquareKey(indexLeft, indexTop);
+			return this.squares[key];
+		}
+	}, {
+		key: 'getSquareKey',
+		value: function getSquareKey(indexTop, indexLeft) {
+			return indexTop + '_' + indexLeft;
+		}
+	}, {
 		key: 'setEvent',
 		value: function setEvent(event) {
 			this.event = event;
-		}
-	}, {
-		key: 'landingRobot',
-		value: function landingRobot(robot) {
-
-			robot.initDraw();
-			this.robot = robot;
-
-			this.event.on('robot:checkground', function (position) {
-
-				var positionToCkeck = position.top + '_' + position.left;
-
-				if (this.squares[positionToCkeck]) {
-					this.event.emit('ground:robotcanmove', { position: position });
-				} else {
-					this.event.emit('ground:robotcantmove', { response: 'KO' });
-				}
-			}.bind(this));
-
-			robot.setNewPosition(this.level.startPosition[0], this.level.startPosition[1], true);
-
-			this.$ground.append(this.robot.$robot);
 		}
 	}, {
 		key: 'draw',
@@ -237,26 +227,40 @@ var Ground = function () {
 
 exports.default = Ground;
 
-},{"./Square":8,"jquery":11}],5:[function(require,module,exports){
+},{"./Square":8,"jquery":13}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Level = function Level(bord, elements, startPosition, level) {
-	_classCallCheck(this, Level);
+var Level = function () {
+	function Level(bord, elements, startPosition, targetPosition, level) {
+		_classCallCheck(this, Level);
 
-	this.level = level;
-	this.bord = bord;
-	this.elements = elements;
-	this.startPosition = startPosition;
-	this.stepSize = 150;
-	this.leftMax = 4;
-	this.topMax = 4;
-};
+		this.level = level;
+		this.bord = bord;
+		this.elements = elements;
+		this.startPosition = startPosition;
+		this.targetPosition = targetPosition;
+		this.step = 150;
+		this.leftMax = 4;
+		this.topMax = 4;
+	}
+
+	_createClass(Level, [{
+		key: "getTarget",
+		value: function getTarget() {
+			return { top: this.targetPosition[0], left: this.targetPosition[1] };
+		}
+	}]);
+
+	return Level;
+}();
 
 exports.default = Level;
 
@@ -278,46 +282,29 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Robot = function () {
-	function Robot(step) {
+	function Robot(level) {
 		var cssClass = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'robot';
 
 		_classCallCheck(this, Robot);
 
+		console.log(level);
+
 		this.cssClass = cssClass;
-		this.step = step;
+		this.level = level;
 		this.style = {
 			background: '#34495e',
 			position: 'absolute',
-			width: step,
-			height: step
+			width: level.step,
+			height: level.step
 		};
+
+		this.currentPosition = { top: 0, left: 0 };
 	}
 
 	_createClass(Robot, [{
 		key: 'setEvent',
 		value: function setEvent(event) {
-
 			this.event = event;
-			this.event.on('ground:robotcanmove', this.waitEventCanMove.bind(this));
-			this.event.on('ground:robotcantmove', this.waitEventCantMove.bind(this));
-		}
-	}, {
-		key: 'waitEventCantMove',
-		value: function waitEventCantMove(response) {
-
-			this.cantMove = true;
-			this.setNewPosition(this.startPosition.top, this.startPosition.left, true);
-		}
-	}, {
-		key: 'waitEventCanMove',
-		value: function waitEventCanMove(response) {
-
-			this.currentPosition = response.position;
-
-			this.$robot.css({
-				top: this.currentPosition.top * this.step,
-				left: this.currentPosition.left * this.step
-			});
 		}
 	}, {
 		key: 'setAction',
@@ -325,26 +312,9 @@ var Robot = function () {
 			this.actions = actions;
 		}
 	}, {
-		key: 'go',
-		value: function go() {
-
-			var that = this;
-
-			setTimeout(function () {
-
-				for (var i in that.actions) {
-
-					var action = that.actions[i];
-
-					(function (that, action, i) {
-
-						setTimeout(function () {
-
-							that.doAction(action);
-						}, 1000 * i);
-					})(that, action, i);
-				}
-			}, 1000);
+		key: 'getActions',
+		value: function getActions(index) {
+			return this.actions[index];
 		}
 	}, {
 		key: 'initDraw',
@@ -355,8 +325,8 @@ var Robot = function () {
 			this.$robot.css(this.style);
 		}
 	}, {
-		key: 'checkNewPosition',
-		value: function checkNewPosition(nbStepTop, nbStepLeft) {
+		key: 'getNewPosition',
+		value: function getNewPosition(nbStepTop, nbStepLeft) {
 
 			var newleft = 0;
 			var newtop = 0;
@@ -365,55 +335,23 @@ var Robot = function () {
 
 			if (nbStepLeft !== 0) newleft = nbStepLeft + this.currentPosition.left;else newleft = this.currentPosition.left;
 
-			this.event.emit('robot:checkground', { top: newtop, left: newleft });
+			return {
+				top: newtop,
+				left: newleft
+			};
 		}
 	}, {
 		key: 'setNewPosition',
-		value: function setNewPosition(nbStepTop, nbStepLeft) {
-			var init = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
+		value: function setNewPosition(position) {
 
 			if (!this.$robot) this.initDraw();
 
-			if (init) this.startPosition = { top: nbStepTop, left: nbStepLeft };
-			if (init) this.currentPosition = { top: 0, left: 0 };
+			this.currentPosition = position;
 
-			if (this.cantMove && !init) return;
-
-			this.checkNewPosition(nbStepTop, nbStepLeft);
-		}
-	}, {
-		key: 'move',
-		value: function move(direction) {
-
-			switch (direction) {
-
-				case "top":
-					this.setNewPosition(-1, 0);
-					break;
-				case "right":
-					this.setNewPosition(0, 1);
-					break;
-				case "bottom":
-					this.setNewPosition(1, 0);
-					break;
-				case "left":
-					this.setNewPosition(0, -1);
-					break;
-
-			}
-		}
-	}, {
-		key: 'doAction',
-		value: function doAction(action) {
-
-			if (this.cantMove) return;
-
-			switch (action.type) {
-				case "move":
-					return this.move(action.direction);
-					break;
-			}
+			this.$robot.css({
+				top: this.currentPosition.top * this.level.step,
+				left: this.currentPosition.left * this.level.step
+			});
 		}
 	}]);
 
@@ -422,7 +360,7 @@ var Robot = function () {
 
 exports.default = Robot;
 
-},{"jquery":11}],7:[function(require,module,exports){
+},{"jquery":13}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -506,7 +444,207 @@ var Square = function () {
 
 exports.default = Square;
 
-},{"jquery":11}],9:[function(require,module,exports){
+},{"jquery":13}],9:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _jquery = require('jquery');
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Target = function () {
+	function Target(level) {
+		var cssClass = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'target';
+
+		_classCallCheck(this, Target);
+
+		this.cssClass = cssClass;
+		this.level = level;
+		this.style = {
+			background: 'green',
+			position: 'absolute',
+			width: level.step,
+			height: level.step
+		};
+
+		this.position = this.level.getTarget();
+		this.initDraw();
+	}
+
+	_createClass(Target, [{
+		key: 'initDraw',
+		value: function initDraw() {
+
+			this.$target = (0, _jquery2.default)('<div></div>');
+			this.$target.addClass(this.cssClass);
+
+			this.style.top = this.position.top * this.level.step;
+			this.style.left = this.position.left * this.level.step;
+
+			this.$target.css(this.style);
+		}
+	}]);
+
+	return Target;
+}();
+
+exports.default = Target;
+
+},{"jquery":13}],10:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _jquery = require("jquery");
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Turn = function () {
+	function Turn(ground, robot, target) {
+		_classCallCheck(this, Turn);
+
+		this.ground = ground;
+		this.robot = robot;
+		this.target = target;
+
+		this.speed = 500;
+
+		this.ground.$ground.append(this.target.$target);
+	}
+
+	_createClass(Turn, [{
+		key: "landingRobot",
+		value: function landingRobot(robot) {
+
+			this.robot.initDraw();
+
+			var position = this.robot.getNewPosition(this.ground.level.startPosition[0], this.ground.level.startPosition[1]);
+
+			this.robot.setNewPosition(position);
+			this.ground.$ground.append(this.robot.$robot);
+		}
+	}, {
+		key: "checkGround",
+		value: function checkGround(position) {
+
+			return true;
+			return this.ground.getSquare(position.top, position.left);
+		}
+	}, {
+		key: "checkTarget",
+		value: function checkTarget(position) {
+
+			var target = this.target.position;
+			if (target.top == position.top && target.left == position.left) return true;
+			return false;
+		}
+	}, {
+		key: "move",
+		value: function move(direction) {
+
+			var that = this;
+
+			var move = function (top, left) {
+
+				var position = this.robot.getNewPosition(top, left);
+
+				var canGo = this.checkGround(position);
+				this.robot.setNewPosition(position);
+
+				//if(this.checkTarget(position)) alert('win !');
+
+				return true;
+			}.bind(this);
+
+			switch (direction) {
+
+				case "top":
+					move(-1, 0);
+					break;
+				case "right":
+					move(0, 1);
+					break;
+				case "bottom":
+					move(1, 0);
+					break;
+				case "left":
+					move(0, -1);
+					break;
+
+			}
+
+			return false;
+		}
+	}, {
+		key: "doAction",
+		value: function doAction(action) {
+
+			switch (action.type) {
+				case "move":
+					return this.move(action.direction);
+					break;
+			}
+		}
+	}, {
+		key: "clearInterval",
+		value: function (_clearInterval) {
+			function clearInterval() {
+				return _clearInterval.apply(this, arguments);
+			}
+
+			clearInterval.toString = function () {
+				return _clearInterval.toString();
+			};
+
+			return clearInterval;
+		}(function () {
+			clearInterval(this.interval);
+		})
+	}, {
+		key: "go",
+		value: function go() {
+
+			var index = 0;
+			var that = this;
+			this.interval = setInterval(function () {
+
+				var action = that.robot.getActions(index);
+
+				if (!action) {
+					that.clearInterval();
+					return;
+				}
+
+				that.doAction(action);
+
+				index++;
+			}, this.speed);
+		}
+	}]);
+
+	return Turn;
+}();
+
+exports.default = Turn;
+
+},{"jquery":13}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -539,7 +677,7 @@ var Water = function (_Element) {
 
 exports.default = Water;
 
-},{"./Element":2}],10:[function(require,module,exports){
+},{"./Element":2}],12:[function(require,module,exports){
 'use strict';
 
 var _jquery = require('jquery');
@@ -578,6 +716,14 @@ var _EventEmitter = require('./EventEmitter');
 
 var _EventEmitter2 = _interopRequireDefault(_EventEmitter);
 
+var _Turn = require('./Turn');
+
+var _Turn2 = _interopRequireDefault(_Turn);
+
+var _Target = require('./Target');
+
+var _Target2 = _interopRequireDefault(_Target);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /** Event */
@@ -590,35 +736,43 @@ var elements = [new _Rock2.default(), new _Water2.default()];
 var bord_1 = [[1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 1], [1, 0], [1, 0], [1, 1], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0]];
 
 /** Création du level */
-var level1 = new _Level2.default(bord_1, elements, [3, 0], 1);
+var level1 = new _Level2.default(bord_1, elements, [3, 0], [2, 1], 1);
+
+/** Target */
+var target = new _Target2.default(level1);
 
 /** Nouvelle map */
 var ground = new _Ground2.default(level1);
 ground.setEvent(eventEmitter);
 
-/** Nouveau jeu */
-var area = new _Area2.default(600, 'auto');
-
 /** Nouveau Robot */
-var robot = new _Robot2.default(level1.stepSize);
+var robot = new _Robot2.default(level1);
 robot.setEvent(eventEmitter);
 
 var actionsRobot = [{ type: 'move', direction: 'right' }, { type: 'move', direction: 'right' }, { type: 'move', direction: 'right' }, { type: 'move', direction: 'top' }, { type: 'move', direction: 'top' }, { type: 'move', direction: 'top' }, { type: 'move', direction: 'left' }, { type: 'move', direction: 'left' }, { type: 'move', direction: 'left' }, { type: 'move', direction: 'bottom' }, { type: 'move', direction: 'right' }, { type: 'move', direction: 'right' }, { type: 'move', direction: 'bottom' }, { type: 'move', direction: 'left' }];
+
+/** Nouveau jeu */
+var area = new _Area2.default(600, 'auto');
 
 (0, _jquery2.default)(document).ready(function () {
 
 	/** Initialisation du jeu */
 	area.init();
 	/** Dessin de la map */
-	area.drawMap(ground);
-	/** lancer le robot */
-	ground.landingRobot(robot);
+	area.drawMap(ground, target);
 
+	var turn = new _Turn2.default(ground, robot, target);
+	/** lancer le robot */
+	turn.landingRobot();
+
+	/** Ajouter les actions au robot */
 	robot.setAction(actionsRobot);
-	robot.go();
+	/** Lancer le robot */
+
+	turn.go();
 });
 
-},{"./Area":1,"./EventEmitter":3,"./Ground":4,"./Level":5,"./Robot":6,"./Rock":7,"./Square":8,"./Water":9,"jquery":11}],11:[function(require,module,exports){
+},{"./Area":1,"./EventEmitter":3,"./Ground":4,"./Level":5,"./Robot":6,"./Rock":7,"./Square":8,"./Target":9,"./Turn":10,"./Water":11,"jquery":13}],13:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.1.1
  * https://jquery.com/
@@ -10840,4 +10994,4 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{}]},{},[10]);
+},{}]},{},[12]);

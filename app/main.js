@@ -7,6 +7,8 @@ import Rock from "./Rock";
 import Level from "./Level";
 import Robot from "./Robot";
 import EventEmitter from "./EventEmitter";
+import Turn from "./Turn";
+import Target from "./Target";
 
 /** Event */
 var eventEmitter = new EventEmitter();
@@ -26,18 +28,19 @@ var bord_1 = [
 ];
 
 /** Création du level */
-var level1 = new Level(bord_1, elements, [3, 0], 1);
+var level1 = new Level(bord_1, elements, [3, 0], [2, 1], 1);
+
+/** Target */
+var target = new Target(level1);
 
 /** Nouvelle map */
 var ground = new Ground(level1);
 ground.setEvent(eventEmitter);
 
-/** Nouveau jeu */
-var area = new Area(600, 'auto');
-
 /** Nouveau Robot */
-var robot = new Robot(level1.stepSize);
+var robot = new Robot(level1);
 robot.setEvent(eventEmitter);
+
 
 var actionsRobot = [
 	{type : 'move', direction : 'right'},
@@ -54,19 +57,27 @@ var actionsRobot = [
 	{type : 'move', direction : 'right'},
 	{type : 'move', direction : 'bottom'},
 	{type : 'move', direction : 'left'}
-]
+];
+
+/** Nouveau jeu */
+var area = new Area(600, 'auto');
 
 $(document).ready(function(){
 
 	/** Initialisation du jeu */
 	area.init();
 	/** Dessin de la map */
-	area.drawMap(ground);
-	/** lancer le robot */
-	ground.landingRobot(robot);
+	area.drawMap(ground, target);
 
+	var turn = new Turn(ground, robot, target);
+	/** lancer le robot */
+	turn.landingRobot();
+
+	/** Ajouter les actions au robot */
 	robot.setAction(actionsRobot);
-	robot.go();
+	/** Lancer le robot */
+
+	turn.go();
 
 })
 

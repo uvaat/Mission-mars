@@ -2,73 +2,33 @@ import $ from 'jquery';
 
 class Robot{
 
-	constructor(step, cssClass = 'robot'){
+	constructor(level, cssClass = 'robot'){
 
+		console.log(level);
+		
 		this.cssClass = cssClass;
-		this.step = step;
+		this.level = level;
 		this.style = {
 			background : '#34495e',
 			position : 'absolute',
-			width : step,
-			height : step,
-		}
+			width : level.step,
+			height : level.step,
+		};
+
+		this.currentPosition = {top : 0, left : 0};
 
 	}
 
 	setEvent(event){
-
 		this.event = event;
-		this.event.on('ground:robotcanmove', this.waitEventCanMove.bind(this));
-		this.event.on('ground:robotcantmove', this.waitEventCantMove.bind(this));
-
-	}
-
-	waitEventCantMove(response){
-
-		this.cantMove = true;
-		this.setNewPosition(this.startPosition.top, this.startPosition.left, true);
-
-	}
-
-	waitEventCanMove(response){
-
-		this.currentPosition = response.position;
-
-		this.$robot.css({
-			top : this.currentPosition.top * this.step,
-			left : this.currentPosition.left * this.step,
-		});
-
 	}
 
 	setAction(actions){
 		this.actions = actions;
 	}
 
-	go(){
-		
-		let that = this;
-
-		setTimeout(function(){
-
-			for(var i in that.actions){
-
-				let action = that.actions[i];
-
-				(function(that, action, i){
-
-					setTimeout(function(){ 
-										
-						that.doAction(action);
-
-					}, 1000 * i);
-
-				})(that, action, i)
-				
-			}
-
-		}, 1000);
-
+	getActions(index){
+		return this.actions[index];
 	}
 
 	initDraw(){
@@ -79,8 +39,7 @@ class Robot{
 
 	}
 
-
-	checkNewPosition(nbStepTop, nbStepLeft){
+	getNewPosition(nbStepTop, nbStepLeft){
 
 		let newleft = 0;
 		let newtop = 0;
@@ -94,56 +53,27 @@ class Robot{
 			newleft = nbStepLeft + this.currentPosition.left;
 		else
 			newleft = this.currentPosition.left;
-
-		this.event.emit('robot:checkground', {top : newtop, left : newleft});		
+	
+		return {
+			top : newtop,
+			left : newleft
+		};
 	
 	}
 
-	setNewPosition(nbStepTop, nbStepLeft, init = false){
+	setNewPosition(position){
 		
 		if(!this.$robot) this.initDraw();
 
-		if(init) this.startPosition = {top : nbStepTop, left : nbStepLeft};
-		if(init) this.currentPosition = {top: 0, left : 0};
+		this.currentPosition = position;
 
-		if(this.cantMove && !init) return;
-
-		this.checkNewPosition(nbStepTop, nbStepLeft);
-
-	}
-
-	move(direction){
-
-		switch (direction) {
-
-			case "top":
-				this.setNewPosition(-1, 0);
-			break;
-			case "right":
-				this.setNewPosition(0, 1);
-			break;
-			case "bottom":
-				this.setNewPosition(1, 0);
-			break;
-			case "left":
-				this.setNewPosition(0, -1);
-			break;
-
-		}
+		this.$robot.css({
+			top : this.currentPosition.top * this.level.step,
+			left : this.currentPosition.left * this.level.step,
+		});
 
 	}
 
-	doAction(action){
-
-		if(this.cantMove) return;		
-
-		switch (action.type) {
-			case "move": 
-			    return this.move(action.direction);
-			break;
-		}
-
-	}
 
 }
 

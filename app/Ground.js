@@ -9,53 +9,40 @@ class Ground {
 		this.cssClass = cssClass;
 		this.squares = {};
 
-		var index_top = 0;
-		var index_left = -1;
+		var indexTop = 0;
+		var indexLeft = -1;
 
 		for(var i in this.level.bord){
 
-			var element = this.level.elements[this.level.bord[i][1]];
-			var square = new Square(this.level.bord[i][0], element, this.level.stepSize);
+			let element = this.level.elements[this.level.bord[i][1]];
+			let square = new Square(this.level.bord[i][0], element, this.level.step);
 
-			if(index_left < this.level.leftMax -1){
-				index_left ++;
+			if(indexLeft < this.level.leftMax -1){
+				indexLeft ++;
 			}else{
-				index_left = 0;
-				index_top++;
+				indexLeft = 0;
+				indexTop++;
 			}
 
-			this.squares[ index_top + '_' + index_left ] = square;
+			let key = this.getSquareKey(indexLeft, indexTop);
+			this.squares[key] = square;
 
 
 		}
 
 	}
 
-	setEvent(event){
-		this.event = event;
+	getSquare(indexTop, indexLeft){
+		let key = this.getSquareKey(indexLeft, indexTop);
+		return this.squares[key];
 	}
 
-	landingRobot(robot){
+	getSquareKey(indexTop, indexLeft){
+		return  indexTop + '_' + indexLeft;
+	}
 
-		robot.initDraw();
-		this.robot = robot;
-		
-		this.event.on('robot:checkground', function(position){
-
-			var positionToCkeck = position.top + '_' + position.left;
-
-			if(this.squares[positionToCkeck]){
-				this.event.emit('ground:robotcanmove', {position : position});
-			}else{
-				this.event.emit('ground:robotcantmove', {response : 'KO'});
-			}
-
-		}.bind(this));
-
-		robot.setNewPosition(this.level.startPosition[0], this.level.startPosition[1], true);
-
-		this.$ground.append(this.robot.$robot);
-
+	setEvent(event){
+		this.event = event;
 	}
 
 	draw($area){
