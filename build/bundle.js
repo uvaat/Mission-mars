@@ -50,7 +50,7 @@ var Area = function () {
 
 exports.default = Area;
 
-},{"jquery":13}],2:[function(require,module,exports){
+},{"jquery":14}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -69,6 +69,36 @@ var Element = function Element(name, color) {
 exports.default = Element;
 
 },{}],3:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Error = function () {
+	function Error(text) {
+		_classCallCheck(this, Error);
+
+		this.text = text;
+	}
+
+	_createClass(Error, [{
+		key: "get",
+		value: function get() {
+			return this.text;
+		}
+	}]);
+
+	return Error;
+}();
+
+exports.default = Error;
+
+},{}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -140,7 +170,247 @@ var EventEmitter = function () {
 
 exports.default = EventEmitter;
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _jquery = require('jquery');
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+var _Error = require('./Error');
+
+var _Error2 = _interopRequireDefault(_Error);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Game = function () {
+
+	/**
+  * Tour de jeux
+  * @param  {Groud} ground (la map)
+  * @param  {Robot} robot  (le robot)
+  * @param  {Target} target (la cible du robot)
+  * @return {Void}
+  */
+	function Game(ground, robot, target) {
+		_classCallCheck(this, Game);
+
+		this.ground = ground;
+		this.robot = robot;
+		this.target = target;
+
+		this.speed = 500;
+
+		this.ground.$ground.append(this.target.$target);
+	}
+
+	_createClass(Game, [{
+		key: 'setEvent',
+		value: function setEvent(event) {
+			this.event = event;
+		}
+
+		/**
+   * Déposer le robot du la map
+   * @return {Void}
+   */
+
+	}, {
+		key: 'landingRobot',
+		value: function landingRobot() {
+
+			this.robot.initDraw();
+
+			var start = this.ground.level.getStart();
+			var position = this.robot.getNewPosition(start.top, start.left);
+
+			this.robot.setNewPosition(position);
+			this.ground.$ground.append(this.robot.$robot);
+		}
+
+		/**
+   * Vérifier la case de la map
+   * @param  {Json} position
+   * @return {Bool}
+   */
+
+	}, {
+		key: 'checkGround',
+		value: function checkGround(position) {
+
+			return this.ground.getSquare(position.top, position.left);
+		}
+
+		/**
+   * Verifier si la position est la même que la cible à attendre
+   * @param  {Json} position
+   * @return {Bool}
+   */
+
+	}, {
+		key: 'checkTarget',
+		value: function checkTarget(position) {
+
+			var target = this.target.position;
+			return target.top == position.top && target.left == position.left;
+		}
+
+		/**
+   * Action bouger
+   * @param  {String} direction (la direction que doit prendre le robot)
+   * @return {Void}
+   */
+
+	}, {
+		key: 'move',
+		value: function move(direction) {
+
+			var move = function (top, left) {
+
+				var position = this.robot.getNewPosition(top, left);
+
+				var canGo = this.checkGround(position);
+
+				if (!canGo) {
+
+					this.event.emit('move:error', new _Error2.default('On peut pas y aller..'));
+					return;
+				}
+
+				this.robot.setNewPosition(position);
+
+				if (this.checkTarget(position)) {
+
+					this.clearInterval();
+
+					setTimeout(function () {
+
+						console.log('you win');
+					}, this.speed);
+
+					return;
+				}
+
+				return;
+			}.bind(this);
+
+			switch (direction) {
+
+				case "top":
+					move(-1, 0);
+					break;
+				case "right":
+					move(0, 1);
+					break;
+				case "bottom":
+					move(1, 0);
+					break;
+				case "left":
+					move(0, -1);
+					break;
+
+			}
+
+			return false;
+		}
+
+		/**
+   * Actionner un action du robot
+   * @param  {Json} action
+   * @return {Bool}
+   */
+
+	}, {
+		key: 'doAction',
+		value: function doAction(action) {
+
+			switch (action.type) {
+				case "move":
+					return this.move(action.direction);
+					break;
+			}
+		}
+
+		/**
+   * Reset le tour
+   * @return {Interval}
+   */
+
+	}, {
+		key: 'clearInterval',
+		value: function (_clearInterval) {
+			function clearInterval() {
+				return _clearInterval.apply(this, arguments);
+			}
+
+			clearInterval.toString = function () {
+				return _clearInterval.toString();
+			};
+
+			return clearInterval;
+		}(function () {
+			clearInterval(this.interval);
+		})
+	}, {
+		key: 'reset',
+		value: function reset() {
+
+			this.clearInterval();
+			this.robot.reset();
+
+			var start = this.ground.level.getStart();
+			var position = this.robot.getNewPosition(start.top, start.left);
+
+			this.robot.setNewPosition(position);
+		}
+
+		/**
+   * Lancer le tour
+   * @return {Void}
+   */
+
+	}, {
+		key: 'go',
+		value: function go() {
+
+			var index = 0;
+
+			this.interval = setInterval(function () {
+
+				var action = this.robot.getActions(index);
+
+				if (!action) {
+					this.clearInterval();
+					return;
+				}
+
+				this.doAction(action);
+
+				index++;
+			}.bind(this), this.speed);
+
+			/** On attend l'event error pour recomancer un tour */
+			this.event.on('move:error', function (error) {
+
+				this.reset();
+			}.bind(this));
+		}
+	}]);
+
+	return Game;
+}();
+
+exports.default = Game;
+
+},{"./Error":3,"jquery":14}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -227,7 +497,7 @@ var Ground = function () {
 
 exports.default = Ground;
 
-},{"./Square":8,"jquery":13}],5:[function(require,module,exports){
+},{"./Square":10,"jquery":14}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -270,7 +540,7 @@ var Level = function () {
 
 exports.default = Level;
 
-},{}],6:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -323,6 +593,12 @@ var Robot = function () {
 			return this.actions[index];
 		}
 	}, {
+		key: 'reset',
+		value: function reset() {
+			this.actions = {};
+			this.currentPosition = { top: 0, left: 0 };
+		}
+	}, {
 		key: 'initDraw',
 		value: function initDraw() {
 
@@ -366,7 +642,7 @@ var Robot = function () {
 
 exports.default = Robot;
 
-},{"jquery":13}],7:[function(require,module,exports){
+},{"jquery":14}],9:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -399,7 +675,7 @@ var Rock = function (_Element) {
 
 exports.default = Rock;
 
-},{"./Element":2}],8:[function(require,module,exports){
+},{"./Element":2}],10:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -450,7 +726,7 @@ var Square = function () {
 
 exports.default = Square;
 
-},{"jquery":13}],9:[function(require,module,exports){
+},{"jquery":14}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -505,222 +781,7 @@ var Target = function () {
 
 exports.default = Target;
 
-},{"jquery":13}],10:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _jquery = require('jquery');
-
-var _jquery2 = _interopRequireDefault(_jquery);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Turn = function () {
-
-	/**
-  * Tour de jeux
-  * @param  {Groud} ground (la map)
-  * @param  {Robot} robot  (le robot)
-  * @param  {Target} target (la cible du robot)
-  * @return {Void}
-  */
-	function Turn(ground, robot, target) {
-		_classCallCheck(this, Turn);
-
-		this.ground = ground;
-		this.robot = robot;
-		this.target = target;
-
-		this.speed = 500;
-
-		this.ground.$ground.append(this.target.$target);
-	}
-
-	/**
-  * Déposer le robot du la map
-  * @return {Void}
-  */
-
-
-	_createClass(Turn, [{
-		key: 'landingRobot',
-		value: function landingRobot() {
-
-			this.robot.initDraw();
-
-			var start = this.ground.level.getStart();
-			var position = this.robot.getNewPosition(start.top, start.left);
-
-			this.robot.setNewPosition(position);
-			this.ground.$ground.append(this.robot.$robot);
-		}
-
-		/**
-   * Vérifier la case de la map
-   * @param  {Json} position
-   * @return {Bool}
-   */
-
-	}, {
-		key: 'checkGround',
-		value: function checkGround(position) {
-
-			return this.ground.getSquare(position.top, position.left);
-		}
-
-		/**
-   * Verifier si la position est la même que la cible à attendre
-   * @param  {Json} position
-   * @return {Bool}
-   */
-
-	}, {
-		key: 'checkTarget',
-		value: function checkTarget(position) {
-
-			var target = this.target.position;
-			return target.top == position.top && target.left == position.left;
-		}
-
-		/**
-   * Action bouger
-   * @param  {String} direction (la direction que doit prendre le robot)
-   * @return {Bool}
-   */
-
-	}, {
-		key: 'move',
-		value: function move(direction) {
-
-			var move = function (top, left) {
-
-				var position = this.robot.getNewPosition(top, left);
-
-				var canGo = this.checkGround(position);
-
-				if (!canGo) {
-
-					this.clearInterval();
-
-					console.log('you loose');
-
-					return false;
-				}
-
-				this.robot.setNewPosition(position);
-
-				if (this.checkTarget(position)) {
-
-					this.clearInterval();
-
-					setTimeout(function () {
-						console.log('you win');
-					}, this.speed);
-
-					return false;
-				}
-
-				return true;
-			}.bind(this);
-
-			switch (direction) {
-
-				case "top":
-					move(-1, 0);
-					break;
-				case "right":
-					move(0, 1);
-					break;
-				case "bottom":
-					move(1, 0);
-					break;
-				case "left":
-					move(0, -1);
-					break;
-
-			}
-
-			return false;
-		}
-
-		/**
-   * Actionner un action du robot
-   * @param  {Json} action
-   * @return {Bool}
-   */
-
-	}, {
-		key: 'doAction',
-		value: function doAction(action) {
-
-			switch (action.type) {
-				case "move":
-					return this.move(action.direction);
-					break;
-			}
-		}
-
-		/**
-   * Reset le tour
-   * @return {Interval}
-   */
-
-	}, {
-		key: 'clearInterval',
-		value: function (_clearInterval) {
-			function clearInterval() {
-				return _clearInterval.apply(this, arguments);
-			}
-
-			clearInterval.toString = function () {
-				return _clearInterval.toString();
-			};
-
-			return clearInterval;
-		}(function () {
-			clearInterval(this.interval);
-		})
-
-		/**
-   * Lancer le tour
-   * @return {Void}
-   */
-
-	}, {
-		key: 'go',
-		value: function go() {
-
-			var index = 0;
-			var that = this;
-			this.interval = setInterval(function () {
-
-				var action = that.robot.getActions(index);
-
-				if (!action) {
-					that.clearInterval();
-					return;
-				}
-
-				that.doAction(action);
-
-				index++;
-			}, this.speed);
-		}
-	}]);
-
-	return Turn;
-}();
-
-exports.default = Turn;
-
-},{"jquery":13}],11:[function(require,module,exports){
+},{"jquery":14}],12:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -753,7 +814,7 @@ var Water = function (_Element) {
 
 exports.default = Water;
 
-},{"./Element":2}],12:[function(require,module,exports){
+},{"./Element":2}],13:[function(require,module,exports){
 'use strict';
 
 var _jquery = require('jquery');
@@ -792,9 +853,9 @@ var _EventEmitter = require('./EventEmitter');
 
 var _EventEmitter2 = _interopRequireDefault(_EventEmitter);
 
-var _Turn = require('./Turn');
+var _Game = require('./Game');
 
-var _Turn2 = _interopRequireDefault(_Turn);
+var _Game2 = _interopRequireDefault(_Game);
 
 var _Target = require('./Target');
 
@@ -838,19 +899,23 @@ var area = new _Area2.default(600, 'auto');
 	area.drawMap(ground, target);
 
 	/** Nouveau tour */
-	var turn = new _Turn2.default(ground, robot, target);
+	var game = new _Game2.default(ground, robot, target);
+	game.setEvent(eventEmitter);
 
 	/** lancer le robot */
-	turn.landingRobot();
+	game.landingRobot();
 
-	/** Ajouter les actions au robot */
-	robot.setAction(actionsRobot);
+	(0, _jquery2.default)('#go').click(function () {
 
-	/** Lancer le tour */
-	turn.go();
+		/** Ajouter les actions au robot */
+		robot.setAction(actionsRobot);
+
+		/** Lancer le tour */
+		game.go();
+	});
 });
 
-},{"./Area":1,"./EventEmitter":3,"./Ground":4,"./Level":5,"./Robot":6,"./Rock":7,"./Square":8,"./Target":9,"./Turn":10,"./Water":11,"jquery":13}],13:[function(require,module,exports){
+},{"./Area":1,"./EventEmitter":4,"./Game":5,"./Ground":6,"./Level":7,"./Robot":8,"./Rock":9,"./Square":10,"./Target":11,"./Water":12,"jquery":14}],14:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.1.1
  * https://jquery.com/
@@ -11072,4 +11137,4 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{}]},{},[12]);
+},{}]},{},[13]);

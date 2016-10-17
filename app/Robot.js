@@ -31,6 +31,11 @@ class Robot{
 		return this.actions[index];
 	}
 
+	reset(){
+		this.actions = {};
+		this.currentPosition = {top : 0, left : 0};
+	}
+
 	initDraw(){
 
 		this.$robot = $('<div></div>');

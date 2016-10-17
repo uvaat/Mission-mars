@@ -7,7 +7,7 @@ import Rock from "./Rock";
 import Level from "./Level";
 import Robot from "./Robot";
 import EventEmitter from "./EventEmitter";
-import Turn from "./Turn";
+import Game from "./Game";
 import Target from "./Target";
 
 /** Event */
@@ -59,16 +59,21 @@ $(document).ready(function(){
 	area.drawMap(ground, target);
 
 	/** Nouveau tour */
-	var turn = new Turn(ground, robot, target);
+	var game = new Game(ground, robot, target);
+	game.setEvent(eventEmitter);
 
 	/** lancer le robot */
-	turn.landingRobot();
+	game.landingRobot();
 
-	/** Ajouter les actions au robot */
-	robot.setAction(actionsRobot);
+	$('#go').click(function(){
+		
+		/** Ajouter les actions au robot */
+		robot.setAction(actionsRobot);
 
-	/** Lancer le tour */
-	turn.go();
+		/** Lancer le tour */
+		game.go();
+
+	})
 
 })
 
