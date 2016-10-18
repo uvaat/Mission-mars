@@ -5,542 +5,132 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _Ui2 = require('./Ui');
 
-var _jquery = require('jquery');
-
-var _jquery2 = _interopRequireDefault(_jquery);
+var _Ui3 = _interopRequireDefault(_Ui2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Area = function () {
-	function Area(width, height) {
-		_classCallCheck(this, Area);
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-		this.id = 'area';
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-		this.style = {
-			width: width,
-			height: width
-		};
+var ActionsArea = function (_Ui) {
+	_inherits(ActionsArea, _Ui);
+
+	function ActionsArea() {
+		_classCallCheck(this, ActionsArea);
+
+		var _this = _possibleConstructorReturn(this, (ActionsArea.__proto__ || Object.getPrototypeOf(ActionsArea)).call(this, {
+
+			background: '#AFD0BF',
+			width: '100vw',
+			height: '25vh'
+
+		}));
+
+		_this.$area = _this.uicreate({ id: 'action-area' });
+		_this.appendToParent(_this.$area);
+
+		return _this;
 	}
 
-	_createClass(Area, [{
-		key: 'init',
-		value: function init() {
+	return ActionsArea;
+}(_Ui3.default);
 
-			var $area = (0, _jquery2.default)('<div></div>');
-			$area.css(this.style);
-			$area.attr('id', this.id);
-			(0, _jquery2.default)('body').append($area);
+exports.default = ActionsArea;
 
-			this.$area = $area;
-		}
-	}, {
-		key: 'drawMap',
-		value: function drawMap(map) {
-			map.draw(this.$area);
-		}
-	}]);
-
-	return Area;
-}();
-
-exports.default = Area;
-
-},{"jquery":14}],2:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Element = function Element(name, color) {
-	_classCallCheck(this, Element);
-
-	this.name = name;
-	this.color = color;
-};
-
-exports.default = Element;
-
-},{}],3:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Error = function () {
-	function Error(text) {
-		_classCallCheck(this, Error);
-
-		this.text = text;
-	}
-
-	_createClass(Error, [{
-		key: "get",
-		value: function get() {
-			return this.text;
-		}
-	}]);
-
-	return Error;
-}();
-
-exports.default = Error;
-
-},{}],4:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var isFunction = function isFunction(obj) {
-    return typeof obj == 'function' || false;
-};
-
-var EventEmitter = function () {
-    function EventEmitter() {
-        _classCallCheck(this, EventEmitter);
-
-        this.listeners = new Map();
-    }
-
-    _createClass(EventEmitter, [{
-        key: 'on',
-        value: function on(label, callback) {
-            this.listeners.has(label) || this.listeners.set(label, []);
-            this.listeners.get(label).push(callback);
-        }
-    }, {
-        key: 'remove',
-        value: function remove(label, callback) {
-
-            var listeners = this.listeners.get(label),
-                index = void 0;
-
-            if (listeners && listeners.length) {
-                index = listeners.reduce(function (i, listener, index) {
-                    return isFunction(listener) && listener === callback ? i = index : i;
-                }, -1);
-
-                if (index > -1) {
-                    listeners.splice(index, 1);
-                    this.listeners.set(label, listeners);
-                    return true;
-                }
-            }
-            return false;
-        }
-    }, {
-        key: 'emit',
-        value: function emit(label) {
-            for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-                args[_key - 1] = arguments[_key];
-            }
-
-            var listeners = this.listeners.get(label);
-
-            if (listeners && listeners.length) {
-                listeners.forEach(function (listener) {
-                    listener.apply(undefined, args);
-                });
-                return true;
-            }
-            return false;
-        }
-    }]);
-
-    return EventEmitter;
-}();
-
-exports.default = EventEmitter;
-
-},{}],5:[function(require,module,exports){
+},{"./Ui":4}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _Ui2 = require('./Ui');
 
-var _jquery = require('jquery');
-
-var _jquery2 = _interopRequireDefault(_jquery);
-
-var _Error = require('./Error');
-
-var _Error2 = _interopRequireDefault(_Error);
+var _Ui3 = _interopRequireDefault(_Ui2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Game = function () {
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-	/**
-  * Tour de jeux
-  * @param  {Groud} ground (la map)
-  * @param  {Robot} robot  (le robot)
-  * @param  {Target} target (la cible du robot)
-  * @return {Void}
-  */
-	function Game(ground, robot, target) {
-		_classCallCheck(this, Game);
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-		this.ground = ground;
-		this.robot = robot;
-		this.target = target;
+var ControlArea = function (_Ui) {
+	_inherits(ControlArea, _Ui);
 
-		this.speed = 500;
+	function ControlArea() {
+		_classCallCheck(this, ControlArea);
 
-		this.ground.$ground.append(this.target.$target);
+		var _this = _possibleConstructorReturn(this, (ControlArea.__proto__ || Object.getPrototypeOf(ControlArea)).call(this, {
+
+			background: '#92BFB1',
+			width: '100vw',
+			height: '25vh'
+
+		}));
+
+		_this.$area = _this.uicreate({ id: 'control-area' });
+		_this.appendToParent(_this.$area);
+
+		return _this;
 	}
 
-	_createClass(Game, [{
-		key: 'setEvent',
-		value: function setEvent(event) {
-			this.event = event;
-		}
+	return ControlArea;
+}(_Ui3.default);
 
-		/**
-   * Déposer le robot du la map
-   * @return {Void}
-   */
+exports.default = ControlArea;
 
-	}, {
-		key: 'landingRobot',
-		value: function landingRobot() {
-
-			this.robot.initDraw();
-
-			var start = this.ground.level.getStart();
-			var position = this.robot.getNewPosition(start.top, start.left);
-
-			this.robot.setNewPosition(position);
-			this.ground.$ground.append(this.robot.$robot);
-		}
-
-		/**
-   * Vérifier la case de la map
-   * @param  {Json} position
-   * @return {Bool}
-   */
-
-	}, {
-		key: 'checkGround',
-		value: function checkGround(position) {
-
-			return this.ground.getSquare(position.top, position.left);
-		}
-
-		/**
-   * Verifier si la position est la même que la cible à attendre
-   * @param  {Json} position
-   * @return {Bool}
-   */
-
-	}, {
-		key: 'checkTarget',
-		value: function checkTarget(position) {
-
-			var target = this.target.position;
-			return target.top == position.top && target.left == position.left;
-		}
-
-		/**
-   * Action bouger
-   * @param  {String} direction (la direction que doit prendre le robot)
-   * @return {Void}
-   */
-
-	}, {
-		key: 'move',
-		value: function move(direction) {
-
-			var move = function (top, left) {
-
-				var position = this.robot.getNewPosition(top, left);
-
-				var canGo = this.checkGround(position);
-
-				if (!canGo) {
-
-					this.event.emit('move:error', new _Error2.default('On peut pas y aller..'));
-					return;
-				}
-
-				this.robot.setNewPosition(position);
-
-				if (this.checkTarget(position)) {
-
-					this.clearInterval();
-
-					setTimeout(function () {
-
-						console.log('you win');
-					}, this.speed);
-
-					return;
-				}
-
-				return;
-			}.bind(this);
-
-			switch (direction) {
-
-				case "top":
-					move(-1, 0);
-					break;
-				case "right":
-					move(0, 1);
-					break;
-				case "bottom":
-					move(1, 0);
-					break;
-				case "left":
-					move(0, -1);
-					break;
-
-			}
-
-			return false;
-		}
-
-		/**
-   * Actionner un action du robot
-   * @param  {Json} action
-   * @return {Bool}
-   */
-
-	}, {
-		key: 'doAction',
-		value: function doAction(action) {
-
-			switch (action.type) {
-				case "move":
-					return this.move(action.direction);
-					break;
-			}
-		}
-
-		/**
-   * Reset le tour
-   * @return {Interval}
-   */
-
-	}, {
-		key: 'clearInterval',
-		value: function (_clearInterval) {
-			function clearInterval() {
-				return _clearInterval.apply(this, arguments);
-			}
-
-			clearInterval.toString = function () {
-				return _clearInterval.toString();
-			};
-
-			return clearInterval;
-		}(function () {
-			clearInterval(this.interval);
-		})
-	}, {
-		key: 'reset',
-		value: function reset() {
-
-			this.clearInterval();
-			this.robot.reset();
-
-			var start = this.ground.level.getStart();
-			var position = this.robot.getNewPosition(start.top, start.left);
-
-			this.robot.setNewPosition(position);
-		}
-
-		/**
-   * Lancer le tour
-   * @return {Void}
-   */
-
-	}, {
-		key: 'go',
-		value: function go() {
-
-			var index = 0;
-
-			this.interval = setInterval(function () {
-
-				var action = this.robot.getActions(index);
-
-				if (!action) {
-					this.clearInterval();
-					return;
-				}
-
-				this.doAction(action);
-
-				index++;
-			}.bind(this), this.speed);
-
-			/** On attend l'event error pour recomancer un tour */
-			this.event.on('move:error', function (error) {
-
-				this.reset();
-			}.bind(this));
-		}
-	}]);
-
-	return Game;
-}();
-
-exports.default = Game;
-
-},{"./Error":3,"jquery":14}],6:[function(require,module,exports){
+},{"./Ui":4}],3:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _Ui2 = require('./Ui');
 
-var _jquery = require('jquery');
-
-var _jquery2 = _interopRequireDefault(_jquery);
-
-var _Square = require('./Square');
-
-var _Square2 = _interopRequireDefault(_Square);
+var _Ui3 = _interopRequireDefault(_Ui2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Ground = function () {
-	function Ground(level) {
-		var cssClass = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'ground';
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-		_classCallCheck(this, Ground);
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-		this.level = level;
-		this.cssClass = cssClass;
-		this.squares = {};
+var MapArea = function (_Ui) {
+	_inherits(MapArea, _Ui);
 
-		var indexTop = 0;
-		var indexLeft = -1;
+	function MapArea() {
+		_classCallCheck(this, MapArea);
 
-		for (var i in this.level.bord) {
+		var _this = _possibleConstructorReturn(this, (MapArea.__proto__ || Object.getPrototypeOf(MapArea)).call(this, {
 
-			var element = this.level.elements[this.level.bord[i][1]];
-			var square = new _Square2.default(this.level.bord[i][0], element, this.level.step);
+			background: '#F2545B',
+			width: '100vw',
+			height: '50vh'
 
-			if (indexLeft < this.level.leftMax - 1) {
-				indexLeft++;
-			} else {
-				indexLeft = 0;
-				indexTop++;
-			}
+		}));
 
-			var key = this.getSquareKey(indexLeft, indexTop);
-			this.squares[key] = square;
-		}
+		_this.$area = _this.uicreate({ id: 'map-area' });
+		_this.appendToParent(_this.$area);
+
+		return _this;
 	}
 
-	_createClass(Ground, [{
-		key: 'getSquare',
-		value: function getSquare(indexTop, indexLeft) {
-			var key = this.getSquareKey(indexLeft, indexTop);
-			return this.squares[key];
-		}
-	}, {
-		key: 'getSquareKey',
-		value: function getSquareKey(indexTop, indexLeft) {
-			return indexTop + '_' + indexLeft;
-		}
-	}, {
-		key: 'setEvent',
-		value: function setEvent(event) {
-			this.event = event;
-		}
-	}, {
-		key: 'draw',
-		value: function draw($area) {
+	return MapArea;
+}(_Ui3.default);
 
-			this.$ground = (0, _jquery2.default)('<div></div>');
-			this.$ground.addClass(this.cssClass);
+exports.default = MapArea;
 
-			for (var i in this.squares) {
-				this.squares[i].draw(this.$ground);
-			}
-
-			$area.html(this.$ground);
-		}
-	}]);
-
-	return Ground;
-}();
-
-exports.default = Ground;
-
-},{"./Square":10,"jquery":14}],7:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Level = function () {
-	function Level(bord, elements, startPosition, targetPosition, level) {
-		_classCallCheck(this, Level);
-
-		this.bord = bord;
-		this.elements = elements;
-		this.startPosition = startPosition;
-		this.targetPosition = targetPosition;
-		this.level = level;
-
-		this.step = 150;
-		this.leftMax = 4;
-		this.topMax = 4;
-	}
-
-	_createClass(Level, [{
-		key: "getStart",
-		value: function getStart() {
-			return { top: this.startPosition[0], left: this.startPosition[1] };
-		}
-	}, {
-		key: "getTarget",
-		value: function getTarget() {
-			return { top: this.targetPosition[0], left: this.targetPosition[1] };
-		}
-	}]);
-
-	return Level;
-}();
-
-exports.default = Level;
-
-},{}],8:[function(require,module,exports){
+},{"./Ui":4}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -557,365 +147,137 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Robot = function () {
-	function Robot(level) {
-		var cssClass = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'robot';
+var Ui = function () {
+	function Ui() {
+		var styles = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+		var $parent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
-		_classCallCheck(this, Robot);
+		_classCallCheck(this, Ui);
 
-		console.log(level);
+		if (!$parent) this.$parentArea = (0, _jquery2.default)('#area');else this.$parentArea = $parent;
 
-		this.cssClass = cssClass;
-		this.level = level;
-		this.style = {
-			background: '#34495e',
-			position: 'absolute',
-			width: level.step,
-			height: level.step
-		};
-
-		this.currentPosition = { top: 0, left: 0 };
+		this.styles = styles;
 	}
 
-	_createClass(Robot, [{
-		key: 'setEvent',
-		value: function setEvent(event) {
-			this.event = event;
+	_createClass(Ui, [{
+		key: 'uicreate',
+		value: function uicreate(params) {
+
+			this.$elem = (0, _jquery2.default)('<div></div>');
+			for (var i in params) {
+				this.$elem.attr(i, params[i]);
+			}
+			this.$elem.css(this.styles);
 		}
 	}, {
-		key: 'setAction',
-		value: function setAction(actions) {
-			this.actions = actions;
+		key: 'appendToParent',
+		value: function appendToParent() {
+
+			this.$parentArea.append(this.$elem);
 		}
-	}, {
-		key: 'getActions',
-		value: function getActions(index) {
-			return this.actions[index];
-		}
-	}, {
-		key: 'reset',
-		value: function reset() {
-			this.actions = {};
-			this.currentPosition = { top: 0, left: 0 };
-		}
-	}, {
-		key: 'initDraw',
-		value: function initDraw() {
+	}], [{
+		key: 'documentReady',
+		value: function documentReady(callBack) {
 
-			this.$robot = (0, _jquery2.default)('<div></div>');
-			this.$robot.addClass(this.cssClass);
-			this.$robot.css(this.style);
-		}
-	}, {
-		key: 'getNewPosition',
-		value: function getNewPosition(nbStepTop, nbStepLeft) {
-
-			var newleft = 0;
-			var newtop = 0;
-
-			if (nbStepTop !== 0) newtop = nbStepTop + this.currentPosition.top;else newtop = this.currentPosition.top;
-
-			if (nbStepLeft !== 0) newleft = nbStepLeft + this.currentPosition.left;else newleft = this.currentPosition.left;
-
-			return {
-				top: newtop,
-				left: newleft
-			};
-		}
-	}, {
-		key: 'setNewPosition',
-		value: function setNewPosition(position) {
-
-			if (!this.$robot) this.initDraw();
-
-			this.currentPosition = position;
-
-			this.$robot.css({
-				top: this.currentPosition.top * this.level.step,
-				left: this.currentPosition.left * this.level.step
+			(0, _jquery2.default)('body').css({
+				margin: 0,
+				padding: 0,
+				overflow: 'hidden'
 			});
+
+			(0, _jquery2.default)(document).ready(callBack);
 		}
 	}]);
 
-	return Robot;
+	return Ui;
 }();
 
-exports.default = Robot;
+exports.default = Ui;
 
-},{"jquery":14}],9:[function(require,module,exports){
+},{"jquery":6}],5:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
+var _MapArea = require('./MapArea');
 
-var _Element2 = require('./Element');
+var _MapArea2 = _interopRequireDefault(_MapArea);
 
-var _Element3 = _interopRequireDefault(_Element2);
+var _ActionsArea = require('./ActionsArea');
+
+var _ActionsArea2 = _interopRequireDefault(_ActionsArea);
+
+var _ControlArea = require('./ControlArea');
+
+var _ControlArea2 = _interopRequireDefault(_ControlArea);
+
+var _Ui = require('./Ui');
+
+var _Ui2 = _interopRequireDefault(_Ui);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+_Ui2.default.documentReady(function () {
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	var mapArea = new _MapArea2.default();
+	var actionsArea = new _ActionsArea2.default();
+	var controlArea = new _ControlArea2.default();
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Rock = function (_Element) {
-	_inherits(Rock, _Element);
-
-	function Rock() {
-		_classCallCheck(this, Rock);
-
-		return _possibleConstructorReturn(this, (Rock.__proto__ || Object.getPrototypeOf(Rock)).call(this, 'Pierre', '#e85344'));
-	}
-
-	return Rock;
-}(_Element3.default);
-
-exports.default = Rock;
-
-},{"./Element":2}],10:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
+	// On crer les type de jeux (voir les interfaces es6)
+	// 		=> l'objectif à atteindre (suivant le type de jeux)
+	// 		=> les inscrtruction (suiviant le type de jeux)
+	// 
+	// 2 idée de type de jeux
+	// -> 1 - aller d'un poind A à un poind B
+	// -> 2 - Aller chercher le maximun de resource
+	// 
+	// On crer un Niveau (un peu la config de la map - du robot)
+	// 		=> la taille d'une case (carrée)
+	// 		=> le tableau d'élement à positionner sur la map
+	// 		=> te tableau qui servira à créer la map avec (hauteur, id element etc...)
+	// 		=> le type de jeux
+	// 		=> un tableau d'action possible
+	// 		
+	// 		-> Un element
+	// 			-> un nom
+	// 			-> un type
+	// 			
+	// 		-> Une action
+	// 			-> un nom
+	// 			-> un type
+	// 
+	// On crer une map
+	//  	=> un niveau
+	//  	
+	// On crer un robot
+	// 		=> un Niveau
+	//  
+	// On crer une mission
+	//  	=> une map
+	//  	=> un robot
+	//  	=> le type de jeux
+	//  
+	//  On lance la mission
+	//  	=> la carte s'afficher
+	//  	=> le robot tombe à sa position
+	//  	=> on affiche les actions possible
+	//  	=> la timeline d'action est vide aussi
+	//  	=> On affiche le bouton go
+	//  	
+	//  L'utilisateur selectionne ses actions (drag & drop)
+	//  L'utilisateur appuit sur go
+	//  On remplis alors le robot des actions choisis
+	//  La mission se lance
+	//  
+	//  	=> on boucle sur le tableau des actions
+	//  		=> si l'action n'existe pas
+	//  			-> on annule la mission et on la recomence à zero
+	//  		=> si le robot ne vas pas dans la bonne direction apres avoir fini les action
+	//  			-> on annule la mission et on la recomence à zero
+	//  		=> si le robot arrive au but de la mission
+	//  			-> on recrer un niveau et on relance la boucle
+	//
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _jquery = require('jquery');
-
-var _jquery2 = _interopRequireDefault(_jquery);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Square = function () {
-	function Square(height, element, step) {
-		var cssClass = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'square';
-
-		_classCallCheck(this, Square);
-
-		this.height = height;
-		this.element = element;
-		this.cssClass = cssClass;
-
-		this.style = {
-			width: step,
-			height: step,
-			background: this.element.color,
-			float: 'left'
-		};
-	}
-
-	_createClass(Square, [{
-		key: 'draw',
-		value: function draw($container) {
-
-			var $square = (0, _jquery2.default)('<div></div>');
-			$square.css(this.style);
-			$square.addClass(this.cssClass);
-			$container.append($square);
-		}
-	}]);
-
-	return Square;
-}();
-
-exports.default = Square;
-
-},{"jquery":14}],11:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _jquery = require('jquery');
-
-var _jquery2 = _interopRequireDefault(_jquery);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Target = function () {
-	function Target(level) {
-		var cssClass = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'target';
-
-		_classCallCheck(this, Target);
-
-		this.cssClass = cssClass;
-		this.level = level;
-		this.style = {
-			background: 'green',
-			position: 'absolute',
-			width: level.step,
-			height: level.step
-		};
-
-		this.position = this.level.getTarget();
-		this.initDraw();
-	}
-
-	_createClass(Target, [{
-		key: 'initDraw',
-		value: function initDraw() {
-
-			this.$target = (0, _jquery2.default)('<div></div>');
-			this.$target.addClass(this.cssClass);
-
-			this.style.top = this.position.top * this.level.step;
-			this.style.left = this.position.left * this.level.step;
-
-			this.$target.css(this.style);
-		}
-	}]);
-
-	return Target;
-}();
-
-exports.default = Target;
-
-},{"jquery":14}],12:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _Element2 = require('./Element');
-
-var _Element3 = _interopRequireDefault(_Element2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Water = function (_Element) {
-	_inherits(Water, _Element);
-
-	function Water() {
-		_classCallCheck(this, Water);
-
-		return _possibleConstructorReturn(this, (Water.__proto__ || Object.getPrototypeOf(Water)).call(this, 'Eau', '#ecf0f1'));
-	}
-
-	return Water;
-}(_Element3.default);
-
-exports.default = Water;
-
-},{"./Element":2}],13:[function(require,module,exports){
-'use strict';
-
-var _jquery = require('jquery');
-
-var _jquery2 = _interopRequireDefault(_jquery);
-
-var _Area = require('./Area');
-
-var _Area2 = _interopRequireDefault(_Area);
-
-var _Ground = require('./Ground');
-
-var _Ground2 = _interopRequireDefault(_Ground);
-
-var _Square = require('./Square');
-
-var _Square2 = _interopRequireDefault(_Square);
-
-var _Water = require('./Water');
-
-var _Water2 = _interopRequireDefault(_Water);
-
-var _Rock = require('./Rock');
-
-var _Rock2 = _interopRequireDefault(_Rock);
-
-var _Level = require('./Level');
-
-var _Level2 = _interopRequireDefault(_Level);
-
-var _Robot = require('./Robot');
-
-var _Robot2 = _interopRequireDefault(_Robot);
-
-var _EventEmitter = require('./EventEmitter');
-
-var _EventEmitter2 = _interopRequireDefault(_EventEmitter);
-
-var _Game = require('./Game');
-
-var _Game2 = _interopRequireDefault(_Game);
-
-var _Target = require('./Target');
-
-var _Target2 = _interopRequireDefault(_Target);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/** Event */
-var eventEmitter = new _EventEmitter2.default();
-
-/** Création des éléments */
-var elements = [new _Rock2.default(), new _Water2.default()];
-
-/** Création du niveau */
-var bord_1 = [[1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 1], [1, 0], [1, 0], [1, 1], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0]];
-
-/** Création du level */
-var level1 = new _Level2.default(bord_1, elements, [3, 0], [2, 1], 1);
-
-/** Target */
-var target = new _Target2.default(level1);
-
-/** Nouvelle map */
-var ground = new _Ground2.default(level1);
-ground.setEvent(eventEmitter);
-
-/** Nouveau Robot */
-var robot = new _Robot2.default(level1);
-robot.setEvent(eventEmitter);
-
-var actionsRobot = [{ type: 'move', direction: 'right' }, { type: 'move', direction: 'right' }, { type: 'move', direction: 'bottom' }];
-
-/** Nouveau jeu */
-var area = new _Area2.default(600, 'auto');
-
-(0, _jquery2.default)(document).ready(function () {
-
-	/** Initialisation du jeu */
-	area.init();
-	/** Dessin de la map */
-	area.drawMap(ground, target);
-
-	/** Nouveau tour */
-	var game = new _Game2.default(ground, robot, target);
-	game.setEvent(eventEmitter);
-
-	/** lancer le robot */
-	game.landingRobot();
-
-	(0, _jquery2.default)('#go').click(function () {
-
-		/** Ajouter les actions au robot */
-		robot.setAction(actionsRobot);
-
-		/** Lancer le tour */
-		game.go();
-	});
-});
-
-},{"./Area":1,"./EventEmitter":4,"./Game":5,"./Ground":6,"./Level":7,"./Robot":8,"./Rock":9,"./Square":10,"./Target":11,"./Water":12,"jquery":14}],14:[function(require,module,exports){
+},{"./ActionsArea":1,"./ControlArea":2,"./MapArea":3,"./Ui":4}],6:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.1.1
  * https://jquery.com/
@@ -11137,4 +10499,4 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{}]},{},[13]);
+},{}]},{},[5]);

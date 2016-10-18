@@ -1,79 +1,67 @@
-import $ from 'jquery';
-import Area from './Area';
-import Ground from "./Ground";
-import Square from "./Square";
-import Water from "./Water";
-import Rock from "./Rock";
-import Level from "./Level";
-import Robot from "./Robot";
-import EventEmitter from "./EventEmitter";
-import Game from "./Game";
-import Target from "./Target";
+import MapArea from './MapArea';
+import ActionsArea from './ActionsArea';
+import ControlArea from './ControlArea';
+import Ui from './Ui';
 
-/** Event */
-var eventEmitter = new EventEmitter();
+Ui.documentReady(function(){
 
-/** Création des éléments */
-var elements = [
-	new Rock(),
-	new Water()
-];
+	let mapArea = new MapArea();
+	let actionsArea = new ActionsArea();
+	let controlArea = new ControlArea();
 
-/** Création du niveau */
-var bord_1 = [
-	[1,0],[1,0],[1,0],[1,0],
-	[1,0],[1,0],[1,1],[1,0],
-	[1,0],[1,1],[1,0],[1,0],
-	[1,0],[1,0],[1,0],[1,0],
-];
-
-/** Création du level */
-var level1 = new Level(bord_1, elements, [3, 0], [2, 1], 1);
-
-/** Target */
-var target = new Target(level1);
-
-/** Nouvelle map */
-var ground = new Ground(level1);
-ground.setEvent(eventEmitter);
-
-/** Nouveau Robot */
-var robot = new Robot(level1);
-robot.setEvent(eventEmitter);
-
-
-var actionsRobot = [
-	{type : 'move', direction : 'right'},
-	{type : 'move', direction : 'right'},
-	{type : 'move', direction : 'bottom'}
-];
-
-/** Nouveau jeu */
-var area = new Area(600, 'auto');
-
-$(document).ready(function(){
-
-	/** Initialisation du jeu */
-	area.init();
-	/** Dessin de la map */
-	area.drawMap(ground, target);
-
-	/** Nouveau tour */
-	var game = new Game(ground, robot, target);
-	game.setEvent(eventEmitter);
-
-	/** lancer le robot */
-	game.landingRobot();
-
-	$('#go').click(function(){
-		
-		/** Ajouter les actions au robot */
-		robot.setAction(actionsRobot);
-
-		/** Lancer le tour */
-		game.go();
-
-	})
+	// On crer les type de jeux (voir les interfaces es6)
+	// 		=> l'objectif à atteindre (suivant le type de jeux)
+	// 		=> les inscrtruction (suiviant le type de jeux)
+	// 
+	// 2 idée de type de jeux
+	// -> 1 - aller d'un poind A à un poind B
+	// -> 2 - Aller chercher le maximun de resource
+	// 
+	// On crer un Niveau (un peu la config de la map - du robot)
+	// 		=> la taille d'une case (carrée)
+	// 		=> le tableau d'élement à positionner sur la map
+	// 		=> te tableau qui servira à créer la map avec (hauteur, id element etc...)
+	// 		=> le type de jeux
+	// 		=> un tableau d'action possible
+	// 		
+	// 		-> Un element
+	// 			-> un nom
+	// 			-> un type
+	// 			
+	// 		-> Une action
+	// 			-> un nom
+	// 			-> un type
+	// 
+	// On crer une map
+	//  	=> un niveau
+	//  	
+	// On crer un robot
+	// 		=> un Niveau
+	//  
+	// On crer une mission
+	//  	=> une map
+	//  	=> un robot
+	//  	=> le type de jeux
+	//  
+	//  On lance la mission
+	//  	=> la carte s'afficher
+	//  	=> le robot tombe à sa position
+	//  	=> on affiche les actions possible
+	//  	=> la timeline d'action est vide aussi
+	//  	=> On affiche le bouton go
+	//  	
+	//  L'utilisateur selectionne ses actions (drag & drop)
+	//  L'utilisateur appuit sur go
+	//  On remplis alors le robot des actions choisis
+	//  La mission se lance
+	//  
+	//  	=> on boucle sur le tableau des actions
+	//  		=> si l'action n'existe pas
+	//  			-> on annule la mission et on la recomence à zero
+	//  		=> si le robot ne vas pas dans la bonne direction apres avoir fini les action
+	//  			-> on annule la mission et on la recomence à zero
+	//  		=> si le robot arrive au but de la mission
+	//  			-> on recrer un niveau et on relance la boucle
+	//
 
 })
-
