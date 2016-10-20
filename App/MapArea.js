@@ -12,7 +12,7 @@ class MapArea extends Ui{
 
 		});
 
-		this.$area = this.uicreate({ id : 'map-area' });
+		this.uicreate({ id : 'map-area' });
 		this.appendToParent(this.$area);
 
 	}	

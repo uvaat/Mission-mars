@@ -1,4 +1,5 @@
 import Ui from './Ui';
+import Control from './Control';
 
 class ActionsArea extends Ui{
 
@@ -12,10 +13,49 @@ class ActionsArea extends Ui{
 
 		});
 
-		this.$area = this.uicreate({ id : 'action-area' });
-		this.appendToParent(this.$area);
+		this.uicreate({ id : 'action-area' });
+		this.appendToParent();
+		this.actions = [];
 
-	}	
+	}
+
+	reset(){
+
+		if(this.actions.length){
+
+			for(let i in this.actions){
+				this.actions[i].delete();
+				this.actions[i] = 'undefined';
+			}
+			
+			this.actions = [];
+
+		}
+
+	}
+
+	removeAction(action, index){
+
+    	this.actions.splice(index, 1);
+		action.delete();
+		action = 'undefined';
+
+	}
+
+	addAction(control){
+
+		let action = Object.assign(Object.create(control), control);
+		action.uicreate({ class : 'action-' + action.name })
+		action.setParent(this.$elem);
+		action.appendToParent();
+		this.actions.push(action);
+
+		var that = this;
+		action.click(function(action){
+			that.removeAction(action, action.$elem.index());
+		});
+
+	}
 
 }
 

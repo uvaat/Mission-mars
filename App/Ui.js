@@ -4,10 +4,25 @@ class Ui {
 
 	constructor(styles = {}, $parent = false){
 
-		if(!$parent) this.$parentArea = $('#area');
-		else this.$parentArea = $parent;
+		if(!$parent) this.setParent($('#area'));
+		else this.setParent($parent);
 
 		this.styles = styles;
+
+	}
+
+	setParent($parent){
+		this.$parentArea = $parent;
+	}
+
+	click(callBack){
+
+		this.$elem.click(function(e){
+
+			e.preventDefault();
+			callBack(this);
+
+		}.bind(this));
 
 	}
 
@@ -22,9 +37,7 @@ class Ui {
 	}
 
 	appendToParent(){
-
 		this.$parentArea.append(this.$elem);
-
 	}
 
 	static documentReady(callBack){

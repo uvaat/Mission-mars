@@ -1,27 +1,73 @@
 import MapArea from './MapArea';
 import ActionsArea from './ActionsArea';
-import ControlArea from './ControlArea';
+import ControlsArea from './ControlsArea';
+import GoToGame from './GoToGame';
+import Rock from './Rock';
+import Move from './Move';
+import Level from './Level';
+import Ground from './Ground';
+import Robot from './Robot';
+import Mission from './Mission';
 import Ui from './Ui';
 
 Ui.documentReady(function(){
 
 	let mapArea = new MapArea();
 	let actionsArea = new ActionsArea();
-	let controlArea = new ControlArea();
+	let controlsArea = new ControlsArea();
+
+	/** Éléments */
+	let elements = [
+		new Rock()
+	];
+
+	/** Matrice pour créer la map */
+	let matrice = [
+		[1,0],[1,0],[1,0],[1,0],
+		[1,0],[1,0],[1,0],[1,0],
+		[1,0],[1,0],[1,0],[1,0],
+		[1,0],[1,0],[1,0],[1,0],
+	];
+
+	/** Les actions possibles */
+	let controls = [
+		new Move('top', 'red'),
+		new Move('right', 'green'),
+		new Move('bottom', 'yellow'),
+		new Move('left', 'pink')
+	];
+
+	/** Nouveau level */
+	let level = new Level(100, elements, controls, matrice, 4);
+
+	/** Terrain */
+	let ground = new Ground(level);
+
+	/** Robot */
+	let robot = new Robot(level);
+	
+	/** Type de jeux */
+	let goToGame = new GoToGame({x : 0, y: 0}, {x : 1, y : 1});
+
+	/** La mission */
+	let mission = new Mission(level, ground, robot, goToGame);
+
+	mission.initGround(mapArea.$elem);
+	mission.initControls(controlsArea.$elem);
+	mission.initActions(actionsArea);
 
 	// On crer les type de jeux (voir les interfaces es6)
 	// 		=> l'objectif à atteindre (suivant le type de jeux)
-	// 		=> les inscrtruction (suiviant le type de jeux)
+	// 		=> les instructions (suiviant le type de jeux)
 	// 
-	// 2 idée de type de jeux
+	// 2 Type de jeux
 	// -> 1 - aller d'un poind A à un poind B
-	// -> 2 - Aller chercher le maximun de resource
+	// -> 2 - aller chercher le maximun de resource
 	// 
 	// On crer un Niveau (un peu la config de la map - du robot)
 	// 		=> la taille d'une case (carrée)
 	// 		=> le tableau d'élement à positionner sur la map
 	// 		=> te tableau qui servira à créer la map avec (hauteur, id element etc...)
-	// 		=> le type de jeux
 	// 		=> un tableau d'action possible
 	// 		
 	// 		-> Un element
@@ -34,6 +80,7 @@ Ui.documentReady(function(){
 	// 
 	// On crer une map
 	//  	=> un niveau
+	//  	=> des case son générer avec la matrice du niveau
 	//  	
 	// On crer un robot
 	// 		=> un Niveau

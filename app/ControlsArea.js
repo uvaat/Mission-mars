@@ -1,12 +1,12 @@
 import Ui from './Ui';
 
-class ControlArea extends Ui{
+class ControlsArea extends Ui{
 
 	constructor(){
 		
 		super({
 
-			background : '#92BFB1',
+			background : '#32908F',
 			width : '100vw',
 			height : '25vh',
 
@@ -19,4 +19,4 @@ class ControlArea extends Ui{
 
 }
 
-export default ControlArea;
+export default ControlsArea;
