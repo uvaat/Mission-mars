@@ -1,3 +1,104 @@
+html {
+  box-sizing: border-box; }
+
+*, *:before, *:after {
+  box-sizing: inherit; }
+
 body {
   margin: 0;
-  padding: 0; }
+  padding: 0;
+  overflow: hidden; }
+
+.action-move, .controls-move {
+  width: 20vh;
+  height: 20vh;
+  float: left;
+  position: relative;
+  background: #A8DADC;
+  cursor: pointer; }
+  .action-move:before, .controls-move:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    background-color: #F2545B;
+    mask-size: 50%;
+    -webkit-mask-size: 50%;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-position: center; }
+  .action-move.move-top:before, .controls-move.move-top:before {
+    -webkit-mask-image: url(../assets/icon/up-arrow.svg);
+    mask-image: url(../assets/icon/up-arrow.svg); }
+  .action-move.move-right:before, .controls-move.move-right:before {
+    -webkit-mask-image: url(../assets/icon/next-1.svg);
+    mask-image: url(../assets/icon/next-1.svg); }
+  .action-move.move-bottom:before, .controls-move.move-bottom:before {
+    -webkit-mask-image: url(../assets/icon/download.svg);
+    mask-image: url(../assets/icon/download.svg); }
+  .action-move.move-left:before, .controls-move.move-left:before {
+    -webkit-mask-image: url(../assets/icon/previous.svg);
+    mask-image: url(../assets/icon/previous.svg); }
+
+.controls-move:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  border-right: 1px solid #87b6b7; }
+
+#control-area {
+  background: #A8DADC;
+  width: 100vw;
+  height: 20vh; }
+
+#map-area {
+  background: #E63946;
+  width: 100vw;
+  height: 60vh; }
+
+#btn-go {
+  position: fixed;
+  height: 14vh;
+  width: 14vh;
+  top: 63vh;
+  right: 0; }
+  #btn-go:before {
+    content: "";
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    left: 0px;
+    bottom: 0px;
+    background-color: #1D3557;
+    mask-size: 60%;
+    -webkit-mask-size: 60%;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-position: center;
+    -webkit-mask-image: url(../assets/icon/play.svg);
+    mask-image: url(../assets/icon/play.svg); }
+
+#action-area {
+  background: #F1FAEE;
+  width: 100vw;
+  height: 20vh;
+  padding: 10px; }
+  #action-area .action-move {
+    height: calc(20vh - 40px);
+    width: calc(20vh - 40px);
+    margin: 10px; }
+    #action-area .action-move.active {
+      background: #457B9D; }
+      #action-area .action-move.active:before {
+        background: #1D3557; }
+
+.square {
+  border-right: 1px solid #E63946;
+  border-top: 1px solid #E63946; }

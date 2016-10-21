@@ -11,6 +11,10 @@ class Ui {
 
 	}
 
+	static getWindowHeight(){
+		return $(window).height();
+	}
+
 	setParent($parent){
 		this.$parentArea = $parent;
 	}
@@ -24,6 +28,10 @@ class Ui {
 
 		}.bind(this));
 
+	}
+
+	addClass(css){
+		this.$elem.addClass(css);
 	}
 
 	uicreate(params){

@@ -7,9 +7,7 @@ class ActionsArea extends Ui{
 		
 		super({
 
-			background : '#AFD0BF',
-			width : '100vw',
-			height : '25vh',
+			
 
 		});
 
@@ -45,7 +43,8 @@ class ActionsArea extends Ui{
 	addAction(control){
 
 		let action = Object.assign(Object.create(control), control);
-		action.uicreate({ class : 'action-' + action.name })
+		console.log(action);
+		action.uicreate({ class : 'action-' + action.name + ' move-' + action.direction });
 		action.setParent(this.$elem);
 		action.appendToParent();
 		this.actions.push(action);

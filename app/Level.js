@@ -2,6 +2,8 @@ class Level{
 
 	constructor(step, elements, controls, matrice, matriceSize){
 		
+		console.log(step);
+		
 		this._step = step;
 		this._elements = elements;
 		this._controls = controls;

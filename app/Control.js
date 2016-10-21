@@ -2,15 +2,9 @@ import Ui from './Ui';
 
 class Control extends Ui{
 
-	constructor(name, color){
+	constructor(name, icon){
 		
-		super({
-			background : color,
-			width : '25vh',
-			height : '25vh',
-			float: 'left'
-		});
-
+		super({});
 		this.name = name;
 		this.uicreate({ class : 'controls-' + name });
 

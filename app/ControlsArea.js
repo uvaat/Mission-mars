@@ -4,13 +4,7 @@ class ControlsArea extends Ui{
 
 	constructor(){
 		
-		super({
-
-			background : '#32908F',
-			width : '100vw',
-			height : '25vh',
-
-		});
+		super({});
 
 		this.$area = this.uicreate({ id : 'control-area' });
 		this.appendToParent(this.$area);

@@ -1,0 +1,60 @@
+.action-move, .controls-move{
+	width: 20vh;
+	height: 20vh;
+	float: left;
+	position: relative;
+	background: #A8DADC;
+	cursor: pointer;
+	&:before{
+		content:"";
+		position: absolute;
+		top: 0;
+		right: 0;
+		left: 0;
+		bottom: 0;
+		background-color: #F2545B;
+    	mask-size: 50%;
+    	-webkit-mask-size: 50%;
+    	mask-repeat: no-repeat;
+    	-webkit-mask-repeat: no-repeat;
+    	mask-position: center;
+    	-webkit-mask-position: center;
+	}
+	&.move-top{
+		&:before{
+			-webkit-mask-image: url(../assets/icon/up-arrow.svg);
+	    	mask-image: url(../assets/icon/up-arrow.svg);
+		}
+	}
+	&.move-right{
+		&:before{
+			-webkit-mask-image: url(../assets/icon/next-1.svg);
+	    	mask-image: url(../assets/icon/next-1.svg);
+		}
+	}
+	&.move-bottom{
+		&:before{
+			-webkit-mask-image: url(../assets/icon/download.svg);
+	    	mask-image: url(../assets/icon/download.svg);
+		}
+	}
+	&.move-left{
+		&:before{
+			-webkit-mask-image: url(../assets/icon/previous.svg);
+	    	mask-image: url(../assets/icon/previous.svg);
+		}
+	}
+}
+.controls-move{
+
+	&:after{
+		content:"";
+		position: absolute;
+		top: 0;
+		right: 0;
+		left: 0;
+		bottom: 0;
+		border-right: 1px solid #87b6b7;
+	}
+
+}

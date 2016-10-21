@@ -4,13 +4,7 @@ class MapArea extends Ui{
 
 	constructor(){
 		
-		super({
-
-			background : '#F2545B',
-			width : '100vw',
-			height : '50vh',
-
-		});
+		super();
 
 		this.uicreate({ id : 'map-area' });
 		this.appendToParent(this.$area);

@@ -12,6 +12,8 @@ import Ui from './Ui';
 
 Ui.documentReady(function(){
 
+
+
 	let mapArea = new MapArea();
 	let actionsArea = new ActionsArea();
 	let controlsArea = new ControlsArea();
@@ -23,22 +25,26 @@ Ui.documentReady(function(){
 
 	/** Matrice pour créer la map */
 	let matrice = [
-		[1,0],[1,0],[1,0],[1,0],
-		[1,0],[1,0],[1,0],[1,0],
-		[1,0],[1,0],[1,0],[1,0],
-		[1,0],[1,0],[1,0],[1,0],
+		[1,0],[1,0],[1,0],[1,0],[1,0],
+		[1,0],[1,0],[1,0],[1,0],[1,0],
+		[1,0],[1,0],[1,0],[1,0],[1,0],
+		[1,0],[1,0],[1,0],[1,0],[1,0],
+		[1,0],[1,0],[1,0],[1,0],[1,0],
 	];
 
 	/** Les actions possibles */
 	let controls = [
-		new Move('top', 'red'),
-		new Move('right', 'green'),
-		new Move('bottom', 'yellow'),
-		new Move('left', 'pink')
+		new Move('top'),
+		new Move('right'),
+		new Move('bottom'),
+		new Move('left')
 	];
 
+	let matriceSize = 5;
+	let step = (Ui.getWindowHeight() - (Ui.getWindowHeight() / 100 * 40)) / matriceSize;
+
 	/** Nouveau level */
-	let level = new Level(100, elements, controls, matrice, 4);
+	let level = new Level(step, elements, controls, matrice, matriceSize);
 
 	/** Terrain */
 	let ground = new Ground(level);

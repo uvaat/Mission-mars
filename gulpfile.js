@@ -31,7 +31,8 @@ gulp.task("build", function(){
 });
 
 gulp.task('sass', function(){
-    return gulp.src('scss/main.scss')
+    console.log('sass');
+    return gulp.src('assets/scss/main.scss')
         .pipe(sass()) // Converts Sass to CSS with gulp-sass
         .pipe(gulp.dest('build/'))
         .pipe(connect.reload());
@@ -39,7 +40,7 @@ gulp.task('sass', function(){
 
 gulp.task('watch', function () {
     gulp.watch('./app/*', ['build']);
-    gulp.watch('./scss/*', ['sass']);
+    gulp.watch('./assets/scss/*', ['sass']);
 });
 
 //Start a test server with doc root at build folder and 

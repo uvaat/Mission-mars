@@ -1,0 +1,17 @@
+#action-area{
+	background: #F1FAEE;
+	width: 100vw;
+	height: 20vh;
+	padding: 10px;
+	.action-move{
+		height: calc(20vh - 40px);
+		width: calc(20vh - 40px);
+		margin: 10px;
+		&.active{
+			background: #457B9D;
+			&:before{
+				background: #1D3557;
+			}
+		}
+	}
+}

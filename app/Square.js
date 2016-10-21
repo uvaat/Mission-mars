@@ -13,7 +13,7 @@ class Square extends Ui {
 
 		},$parent);
 
-		this.uicreate({});
+		this.uicreate({class : 'square' + ' element-' + element.name});
 		
 	}
 

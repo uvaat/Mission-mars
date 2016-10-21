@@ -35,7 +35,7 @@ class Mission {
 		var index = -1;
 		var actions = this.actionArea.actions;
 
-		this.interval = setInterval(function(l){
+		this.interval = setInterval(function(){
 
 			index++;
 
@@ -45,6 +45,9 @@ class Mission {
 				this.clearInterval();
 				return;
 			}
+
+
+			action.addClass('active');
 
 			if(action.name == 'move'){
 

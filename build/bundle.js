@@ -29,13 +29,7 @@ var ActionsArea = function (_Ui) {
 	function ActionsArea() {
 		_classCallCheck(this, ActionsArea);
 
-		var _this = _possibleConstructorReturn(this, (ActionsArea.__proto__ || Object.getPrototypeOf(ActionsArea)).call(this, {
-
-			background: '#AFD0BF',
-			width: '100vw',
-			height: '25vh'
-
-		}));
+		var _this = _possibleConstructorReturn(this, (ActionsArea.__proto__ || Object.getPrototypeOf(ActionsArea)).call(this, {}));
 
 		_this.uicreate({ id: 'action-area' });
 		_this.appendToParent();
@@ -71,7 +65,8 @@ var ActionsArea = function (_Ui) {
 		value: function addAction(control) {
 
 			var action = Object.assign(Object.create(control), control);
-			action.uicreate({ class: 'action-' + action.name });
+			console.log(action);
+			action.uicreate({ class: 'action-' + action.name + ' move-' + action.direction });
 			action.setParent(this.$elem);
 			action.appendToParent();
 			this.actions.push(action);
@@ -112,15 +107,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var Control = function (_Ui) {
 	_inherits(Control, _Ui);
 
-	function Control(name, color) {
+	function Control(name, icon) {
 		_classCallCheck(this, Control);
 
-		var _this = _possibleConstructorReturn(this, (Control.__proto__ || Object.getPrototypeOf(Control)).call(this, {
-			background: color,
-			width: '25vh',
-			height: '25vh',
-			float: 'left'
-		}));
+		var _this = _possibleConstructorReturn(this, (Control.__proto__ || Object.getPrototypeOf(Control)).call(this, {}));
 
 		_this.name = name;
 		_this.uicreate({ class: 'controls-' + name });
@@ -165,13 +155,7 @@ var ControlsArea = function (_Ui) {
 	function ControlsArea() {
 		_classCallCheck(this, ControlsArea);
 
-		var _this = _possibleConstructorReturn(this, (ControlsArea.__proto__ || Object.getPrototypeOf(ControlsArea)).call(this, {
-
-			background: '#32908F',
-			width: '100vw',
-			height: '25vh'
-
-		}));
+		var _this = _possibleConstructorReturn(this, (ControlsArea.__proto__ || Object.getPrototypeOf(ControlsArea)).call(this, {}));
 
 		_this.$area = _this.uicreate({ id: 'control-area' });
 		_this.appendToParent(_this.$area);
@@ -227,16 +211,7 @@ var Go = function (_Ui) {
 	function Go() {
 		_classCallCheck(this, Go);
 
-		var _this = _possibleConstructorReturn(this, (Go.__proto__ || Object.getPrototypeOf(Go)).call(this, {
-
-			background: 'blue',
-			width: '100px',
-			height: '100px',
-			position: 'fixed',
-			top: '0px',
-			right: '0px'
-
-		}));
+		var _this = _possibleConstructorReturn(this, (Go.__proto__ || Object.getPrototypeOf(Go)).call(this, {}));
 
 		_this.uicreate({ id: 'btn-go' });
 		_this.appendToParent();
@@ -388,6 +363,8 @@ var Level = function () {
 	function Level(step, elements, controls, matrice, matriceSize) {
 		_classCallCheck(this, Level);
 
+		console.log(step);
+
 		this._step = step;
 		this._elements = elements;
 		this._controls = controls;
@@ -452,13 +429,7 @@ var MapArea = function (_Ui) {
 	function MapArea() {
 		_classCallCheck(this, MapArea);
 
-		var _this = _possibleConstructorReturn(this, (MapArea.__proto__ || Object.getPrototypeOf(MapArea)).call(this, {
-
-			background: '#F2545B',
-			width: '100vw',
-			height: '50vh'
-
-		}));
+		var _this = _possibleConstructorReturn(this, (MapArea.__proto__ || Object.getPrototypeOf(MapArea)).call(this));
 
 		_this.uicreate({ id: 'map-area' });
 		_this.appendToParent(_this.$area);
@@ -534,7 +505,7 @@ var Mission = function () {
 			var index = -1;
 			var actions = this.actionArea.actions;
 
-			this.interval = setInterval(function (l) {
+			this.interval = setInterval(function () {
 
 				index++;
 
@@ -544,6 +515,8 @@ var Mission = function () {
 					this.clearInterval();
 					return;
 				}
+
+				action.addClass('active');
 
 				if (action.name == 'move') {
 
@@ -624,12 +597,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var Move = function (_Control) {
 	_inherits(Move, _Control);
 
-	function Move(direction, color) {
+	function Move(direction) {
 		_classCallCheck(this, Move);
 
-		var _this = _possibleConstructorReturn(this, (Move.__proto__ || Object.getPrototypeOf(Move)).call(this, 'move', color));
+		var _this = _possibleConstructorReturn(this, (Move.__proto__ || Object.getPrototypeOf(Move)).call(this, 'move'));
 
 		_this.direction = direction;
+		_this.addClass('move-' + direction);
 		return _this;
 	}
 
@@ -769,13 +743,13 @@ var Rock = function (_Element) {
 exports.default = Rock;
 
 },{"./Element":4}],14:[function(require,module,exports){
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _Ui2 = require("./Ui");
+var _Ui2 = require('./Ui');
 
 var _Ui3 = _interopRequireDefault(_Ui2);
 
@@ -802,7 +776,7 @@ var Square = function (_Ui) {
 
 		}, $parent));
 
-		_this.uicreate({});
+		_this.uicreate({ class: 'square' + ' element-' + element.name });
 
 		return _this;
 	}
@@ -857,6 +831,11 @@ var Ui = function () {
 			}.bind(this));
 		}
 	}, {
+		key: 'addClass',
+		value: function addClass(css) {
+			this.$elem.addClass(css);
+		}
+	}, {
 		key: 'uicreate',
 		value: function uicreate(params) {
 
@@ -872,6 +851,11 @@ var Ui = function () {
 			this.$parentArea.append(this.$elem);
 		}
 	}], [{
+		key: 'getWindowHeight',
+		value: function getWindowHeight() {
+			return (0, _jquery2.default)(window).height();
+		}
+	}, {
 		key: 'documentReady',
 		value: function documentReady(callBack) {
 
@@ -949,13 +933,16 @@ _Ui2.default.documentReady(function () {
 	var elements = [new _Rock2.default()];
 
 	/** Matrice pour créer la map */
-	var matrice = [[1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0]];
+	var matrice = [[1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0]];
 
 	/** Les actions possibles */
-	var controls = [new _Move2.default('top', 'red'), new _Move2.default('right', 'green'), new _Move2.default('bottom', 'yellow'), new _Move2.default('left', 'pink')];
+	var controls = [new _Move2.default('top'), new _Move2.default('right'), new _Move2.default('bottom'), new _Move2.default('left')];
+
+	var matriceSize = 5;
+	var step = (_Ui2.default.getWindowHeight() - _Ui2.default.getWindowHeight() / 100 * 40) / matriceSize;
 
 	/** Nouveau level */
-	var level = new _Level2.default(100, elements, controls, matrice, 4);
+	var level = new _Level2.default(step, elements, controls, matrice, matriceSize);
 
 	/** Terrain */
 	var ground = new _Ground2.default(level);

@@ -2,9 +2,10 @@ import Control from './Control';
 
 class Move extends Control{
 
-	constructor(direction, color){
-		super('move', color);
+	constructor(direction){
+		super('move');
 		this.direction = direction;
+		this.addClass('move-' + direction);
 	}
 	
 }
