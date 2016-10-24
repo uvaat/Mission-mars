@@ -7,7 +7,7 @@ class GoToGame{
 
 	isWin(currentPosition){
 		
-		if(currentPosition.x == this.objectivePosition && currentPosition.y == currentPosition.y) return true;
+		if(currentPosition.x == this.objectivePosition.x && currentPosition.y == this.objectivePosition.y) return true;
 		return false;
 
 	}

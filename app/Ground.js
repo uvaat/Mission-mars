@@ -23,6 +23,18 @@ class Ground extends Ui{
 
 	}
 
+	setObjective(position){
+		var key = this.getSquareKey(position.x, position.y);
+		console.log(key);
+
+		for(var i in this.squares){
+
+			if(i == key) this.squares[i].$elem.css('background', 'blue');
+
+		}
+
+	}
+
 	getSquareKey(x, y){
 		return  x + '_' + y;
 	}

@@ -247,7 +247,7 @@ var GoToGame = function () {
 		key: "isWin",
 		value: function isWin(currentPosition) {
 
-			if (currentPosition.x == this.objectivePosition && currentPosition.y == currentPosition.y) return true;
+			if (currentPosition.x == this.objectivePosition.x && currentPosition.y == this.objectivePosition.y) return true;
 			return false;
 		}
 	}]);
@@ -309,6 +309,17 @@ var Ground = function (_Ui) {
 			if (this.squares[key]) return true;else return false;
 		}
 	}, {
+		key: 'setObjective',
+		value: function setObjective(position) {
+			var key = this.getSquareKey(position.x, position.y);
+			console.log(key);
+
+			for (var i in this.squares) {
+
+				if (i == key) this.squares[i].$elem.css('background', 'blue');
+			}
+		}
+	}, {
 		key: 'getSquareKey',
 		value: function getSquareKey(x, y) {
 			return x + '_' + y;
@@ -362,8 +373,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var Level = function () {
 	function Level(step, elements, controls, matrice, matriceSize) {
 		_classCallCheck(this, Level);
-
-		console.log(step);
 
 		this._step = step;
 		this._elements = elements;
@@ -460,7 +469,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Mission = function () {
-	function Mission(level, ground, robot, gameType) {
+	function Mission(level, ground, robot, gameType, callBackWin) {
 		_classCallCheck(this, Mission);
 
 		this.level = level;
@@ -472,6 +481,7 @@ var Mission = function () {
 		this.go = new _Go2.default();
 		this.go.click(this.goMission.bind(this));
 		this.isWin = false;
+		this.callBackWin = callBackWin;
 	}
 
 	_createClass(Mission, [{
@@ -527,8 +537,15 @@ var Mission = function () {
 					if (positionIsOk) {
 
 						this.robot.setPosition(nextPostion);
-						var isWin = this.gameType.isWin(nextPostion);
-						if (isWin) {}
+						this.isWin = this.gameType.isWin(nextPostion);
+						if (this.isWin) {
+
+							setTimeout(function () {
+
+								this.clearInterval();
+								this.callBackWin();
+							}.bind(this), 1000);
+						}
 					} else {
 
 						this.clearInterval();
@@ -542,6 +559,9 @@ var Mission = function () {
 		value: function initGround($parent) {
 
 			this.ground.setParent($parent);
+
+			this.ground.setObjective(this.gameType.objectivePosition);
+
 			this.ground.appendToParent();
 			this.robot.setPosition(this.gameType.startPosition);
 			this.robot.landing(this.ground.$elem);
@@ -933,7 +953,7 @@ _Ui2.default.documentReady(function () {
 	var elements = [new _Rock2.default()];
 
 	/** Matrice pour créer la map */
-	var matrice = [[1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0]];
+	var matrice_1 = [[1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0]];
 
 	/** Les actions possibles */
 	var controls = [new _Move2.default('top'), new _Move2.default('right'), new _Move2.default('bottom'), new _Move2.default('left')];
@@ -942,7 +962,7 @@ _Ui2.default.documentReady(function () {
 	var step = (_Ui2.default.getWindowHeight() - _Ui2.default.getWindowHeight() / 100 * 40) / matriceSize;
 
 	/** Nouveau level */
-	var level = new _Level2.default(step, elements, controls, matrice, matriceSize);
+	var level = new _Level2.default(step, elements, controls, matrice_1, matriceSize);
 
 	/** Terrain */
 	var ground = new _Ground2.default(level);
@@ -954,7 +974,10 @@ _Ui2.default.documentReady(function () {
 	var goToGame = new _GoToGame2.default({ x: 0, y: 0 }, { x: 1, y: 1 });
 
 	/** La mission */
-	var mission = new _Mission2.default(level, ground, robot, goToGame);
+	var mission = new _Mission2.default(level, ground, robot, goToGame, function () {
+
+		alert('you win !');
+	});
 
 	mission.initGround(mapArea.$elem);
 	mission.initControls(controlsArea.$elem);

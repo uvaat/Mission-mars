@@ -2,7 +2,7 @@ import Go from './Go';
 
 class Mission {
 
-	constructor(level, ground, robot, gameType){
+	constructor(level, ground, robot, gameType, callBackWin){
 
 		this.level = level;
 		this.ground = ground;
@@ -13,6 +13,7 @@ class Mission {
 		this.go = new Go();
 		this.go.click(this.goMission.bind(this));
 		this.isWin = false;
+		this.callBackWin = callBackWin;
 
 	}
 
@@ -58,9 +59,16 @@ class Mission {
 				if(positionIsOk){
 				
 					this.robot.setPosition(nextPostion);
-					let isWin = this.gameType.isWin(nextPostion);
-					if(isWin){
+					this.isWin = this.gameType.isWin(nextPostion);
+					if(this.isWin){
 
+						setTimeout(function(){
+
+							this.clearInterval();
+							this.callBackWin();
+
+						}.bind(this), 1000);
+						
 					}
 				
 				}else{
@@ -79,6 +87,9 @@ class Mission {
 	initGround($parent){
 
 		this.ground.setParent($parent);
+
+		this.ground.setObjective(this.gameType.objectivePosition);
+		
 		this.ground.appendToParent();
 		this.robot.setPosition(this.gameType.startPosition);
 		this.robot.landing(this.ground.$elem);

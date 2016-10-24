@@ -12,8 +12,6 @@ import Ui from './Ui';
 
 Ui.documentReady(function(){
 
-
-
 	let mapArea = new MapArea();
 	let actionsArea = new ActionsArea();
 	let controlsArea = new ControlsArea();
@@ -24,7 +22,7 @@ Ui.documentReady(function(){
 	];
 
 	/** Matrice pour créer la map */
-	let matrice = [
+	let matrice_1 = [
 		[1,0],[1,0],[1,0],[1,0],[1,0],
 		[1,0],[1,0],[1,0],[1,0],[1,0],
 		[1,0],[1,0],[1,0],[1,0],[1,0],
@@ -44,7 +42,7 @@ Ui.documentReady(function(){
 	let step = (Ui.getWindowHeight() - (Ui.getWindowHeight() / 100 * 40)) / matriceSize;
 
 	/** Nouveau level */
-	let level = new Level(step, elements, controls, matrice, matriceSize);
+	let level = new Level(step, elements, controls, matrice_1, matriceSize);
 
 	/** Terrain */
 	let ground = new Ground(level);
@@ -56,7 +54,16 @@ Ui.documentReady(function(){
 	let goToGame = new GoToGame({x : 0, y: 0}, {x : 1, y : 1});
 
 	/** La mission */
-	let mission = new Mission(level, ground, robot, goToGame);
+	let mission = new Mission(
+		level,
+		ground,
+		robot,
+		goToGame,
+		function(){
+
+			alert('you win !');
+
+		});
 
 	mission.initGround(mapArea.$elem);
 	mission.initControls(controlsArea.$elem);
