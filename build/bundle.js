@@ -943,26 +943,36 @@ var _Ui2 = _interopRequireDefault(_Ui);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-_Ui2.default.documentReady(function () {
+var levelIndex = 0;
 
-	var mapArea = new _MapArea2.default();
-	var actionsArea = new _ActionsArea2.default();
-	var controlsArea = new _ControlsArea2.default();
+/** Matrices pour créer la map */
+var matrice_1 = [[1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0]];
 
-	/** Éléments */
-	var elements = [new _Rock2.default()];
+var matrice_2 = [[1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0]];
 
-	/** Matrice pour créer la map */
-	var matrice_1 = [[1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0], [1, 0]];
+var matrices = [matrice_1, matrice_2];
 
-	/** Les actions possibles */
-	var controls = [new _Move2.default('top'), new _Move2.default('right'), new _Move2.default('bottom'), new _Move2.default('left')];
+var gameTypes = [new _GoToGame2.default({ x: 0, y: 0 }, { x: 1, y: 1 }), new _GoToGame2.default({ x: 0, y: 0 }, { x: 3, y: 3 })];
+
+/** Éléments */
+var elements = [new _Rock2.default()];
+
+/** Les actions possibles */
+var controls = [new _Move2.default('top'), new _Move2.default('right'), new _Move2.default('bottom'), new _Move2.default('left')];
+
+var mapArea = null;
+var actionsArea = null;
+var controlsArea = null;
+
+var gamefunction = function gamefunction() {
 
 	var matriceSize = 5;
 	var step = (_Ui2.default.getWindowHeight() - _Ui2.default.getWindowHeight() / 100 * 40) / matriceSize;
 
+	var matrice = matrices[levelIndex];
+
 	/** Nouveau level */
-	var level = new _Level2.default(step, elements, controls, matrice_1, matriceSize);
+	var level = new _Level2.default(step, elements, controls, matrice, matriceSize);
 
 	/** Terrain */
 	var ground = new _Ground2.default(level);
@@ -971,72 +981,25 @@ _Ui2.default.documentReady(function () {
 	var robot = new _Robot2.default(level);
 
 	/** Type de jeux */
-	var goToGame = new _GoToGame2.default({ x: 0, y: 0 }, { x: 1, y: 1 });
+	var gameType = gameTypes[levelIndex];
 
 	/** La mission */
-	var mission = new _Mission2.default(level, ground, robot, goToGame, function () {
-
-		alert('you win !');
-	});
+	var mission = new _Mission2.default(level, ground, robot, gameType, gamefunction);
 
 	mission.initGround(mapArea.$elem);
 	mission.initControls(controlsArea.$elem);
 	mission.initActions(actionsArea);
 
-	// On crer les type de jeux (voir les interfaces es6)
-	// 		=> l'objectif à atteindre (suivant le type de jeux)
-	// 		=> les instructions (suiviant le type de jeux)
-	// 
-	// 2 Type de jeux
-	// -> 1 - aller d'un poind A à un poind B
-	// -> 2 - aller chercher le maximun de resource
-	// 
-	// On crer un Niveau (un peu la config de la map - du robot)
-	// 		=> la taille d'une case (carrée)
-	// 		=> le tableau d'élement à positionner sur la map
-	// 		=> te tableau qui servira à créer la map avec (hauteur, id element etc...)
-	// 		=> un tableau d'action possible
-	// 		
-	// 		-> Un element
-	// 			-> un nom
-	// 			-> un type
-	// 			
-	// 		-> Une action
-	// 			-> un nom
-	// 			-> un type
-	// 
-	// On crer une map
-	//  	=> un niveau
-	//  	=> des case son générer avec la matrice du niveau
-	//  	
-	// On crer un robot
-	// 		=> un Niveau
-	//  
-	// On crer une mission
-	//  	=> une map
-	//  	=> un robot
-	//  	=> le type de jeux
-	//  
-	//  On lance la mission
-	//  	=> la carte s'afficher
-	//  	=> le robot tombe à sa position
-	//  	=> on affiche les actions possible
-	//  	=> la timeline d'action est vide aussi
-	//  	=> On affiche le bouton go
-	//  	
-	//  L'utilisateur selectionne ses actions (drag & drop)
-	//  L'utilisateur appuit sur go
-	//  On remplis alors le robot des actions choisis
-	//  La mission se lance
-	//  
-	//  	=> on boucle sur le tableau des actions
-	//  		=> si l'action n'existe pas
-	//  			-> on annule la mission et on la recomence à zero
-	//  		=> si le robot ne vas pas dans la bonne direction apres avoir fini les action
-	//  			-> on annule la mission et on la recomence à zero
-	//  		=> si le robot arrive au but de la mission
-	//  			-> on recrer un niveau et on relance la boucle
-	//
+	levelIndex++;
+};
+
+_Ui2.default.documentReady(function () {
+
+	mapArea = new _MapArea2.default();
+	actionsArea = new _ActionsArea2.default();
+	controlsArea = new _ControlsArea2.default();
+
+	gamefunction();
 });
 
 },{"./ActionsArea":1,"./ControlsArea":3,"./GoToGame":6,"./Ground":7,"./Level":8,"./MapArea":9,"./Mission":10,"./Move":11,"./Robot":12,"./Rock":13,"./Ui":15}],17:[function(require,module,exports){
